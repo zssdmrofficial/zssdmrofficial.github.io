@@ -2,133 +2,322 @@
 <html lang="zh-TW">
 
 <head>
-    <meta charset="UTF-8">
-    <title>張師社會主義民主共和國 - 官方網站</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <title>張師社會主義民主共和國 - 官方網站 (沉浸式 App UI - 新背景)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Noto+Sans+TC:wght@400;700&display=swap"
+        rel="stylesheet" />
+
+    <svg style="position: fixed; width: 0; height: 0" aria-hidden="true">
+        <defs>
+            <filter id="liquid_glass_filter" x="-20%" y="-20%" width="140%" height="140%"
+                filterUnits="objectBoundingBox">
+                <feTurbulence type="fractalNoise" baseFrequency="0.01 0.015" numOctaves="2" seed="10" result="noise">
+                    <animate attributeName="baseFrequency" dur="16s" values="0.01 0.015; 0.015 0.01; 0.01 0.015"
+                        repeatCount="indefinite" />
+                </feTurbulence>
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="30" xChannelSelector="R"
+                    yChannelSelector="G" />
+            </filter>
+        </defs>
+    </svg>
+
     <style>
-        /* 背景設定 */
+        /* ===============================
+        主題變數：UI 組件化與顏色定義
+        =============================== */
+        :root {
+            --bg-dark-overlay: rgba(0, 0, 0, 0.55);
+            /* 深色圖片遮罩，略微加深 */
+            --content-bg: rgba(255, 255, 255, 0.03);
+            /* 內容區塊背景 */
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.75);
+            --accent-color: #b0c4ff;
+            /* 柔和的 UI 藍 */
+            --radius-ui: 24px;
+            /* UI 圓角 */
+            --maxw-content: 700px;
+        }
+
+        /* 全局設定 */
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             margin: 0;
-            font-family: "Inter", "Noto Sans TC", sans-serif;
-            background: linear-gradient(135deg, #ff4d4d, #8b0000);
-            background-attachment: fixed;
-            color: #222;
+            color: var(--text-primary);
+            font-family: "Noto Sans TC", "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #000;
+            /* fallback */
         }
 
-        /* 頁首 */
-        header {
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            color: white;
-            padding: 20px 0;
+        p {
+            margin: 0;
+            line-height: 1.7;
+        }
+
+        /* 1. 全屏背景與遮罩 */
+        .full-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            overflow: hidden;
+        }
+
+        .full-bg img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(60%) grayscale(20%) blur(2px);
+            /* **【調整】** 亮度降低，新增微模糊 */
+            transform: scale(1.03);
+            /* 微放大防止邊緣露餡 */
+        }
+
+        .full-bg::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--bg-dark-overlay);
+            z-index: -1;
+            /* 增加一層深色遮罩 */
+        }
+
+        /* 2. 核心 Liquid Glass 組件（採用您提供的 CSS 邏輯） */
+        .liquid_glass-wrapper {
+            position: relative;
+            display: flex;
+            overflow: hidden;
+            border-radius: var(--border-radius);
+            isolation: isolate;
+            /* 確保層次正確 */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            /* 新增柔和陰影 */
+        }
+
+        .liquid_glass-outer {
+            /* 應用 SVG 濾鏡產生液態失真效果 */
+            backdrop-filter: url(#liquid_glass_filter);
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            border-radius: var(--border-radius);
+            background: transparent;
+        }
+
+        .liquid_glass-cover {
+            /* 負責半透明背景和主要的模糊效果 */
+            backdrop-filter: blur(28px) saturate(180%);
+            -webkit-backdrop-filter: blur(28px) saturate(180%);
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            border-radius: var(--border-radius);
+            background: rgba(255, 255, 255, 0.05);
+            /* 更淡更透明 */
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            /* 新增輕微邊框 */
+        }
+
+        .liquid_glass-sharp {
+            /* 銳利光影/邊緣高光 */
+            position: absolute;
+            inset: 0;
+            z-index: 3;
+            box-shadow: inset 1px 1px 0px 0px rgba(255, 255, 255, 0.4),
+                inset -1px -1px 0px 0px rgba(255, 255, 255, 0.3);
+            /* 調整光影強度，更細膩 */
+            border-radius: var(--border-radius);
+            pointer-events: none;
+        }
+
+        .liquid_glass-reflect {
+            /* 內部柔和反光（液體感） */
+            position: absolute;
+            inset: 1px;
+            z-index: 2;
+            box-shadow: inset 0 0 10px 0 rgba(255, 255, 255, 0.1);
+            /* 柔和內部光暈 */
+            background: radial-gradient(100% 100% at -5% -5%, rgba(255, 255, 255, 0.2), transparent 40%);
+            /* 左上角亮帶 */
+            border-radius: var(--border-radius);
+            pointer-events: none;
+            mix-blend-mode: screen;
+        }
+
+        .icon {
+            z-index: 4;
+            display: flex;
+            width: 100%;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 3. 內容佈局 */
+        .main-container {
+            width: 100%;
+            max-width: var(--maxw-content);
+            margin: 40px auto 120px;
+            /* 底部預留給固定導航 */
+            padding: 0 20px;
+        }
+
+        /* 內容卡片樣式 */
+        .content-card {
+            background: var(--content-bg);
+            backdrop-filter: blur(5px);
+            border-radius: var(--radius-ui);
+            padding: 30px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            font-size: clamp(32px, 4vw, 48px);
+            font-weight: 800;
             text-align: center;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            margin-bottom: 8px;
+            color: var(--accent-color);
+            text-shadow: 0 0 10px rgba(176, 196, 255, 0.5);
         }
 
-        /* 導覽列 */
-        nav {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
+        header p {
+            font-size: 18px;
+            text-align: center;
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+        }
+
+        section h2 {
+            font-size: clamp(24px, 3vw, 30px);
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--accent-color);
+        }
+
+        section p {
+            color: var(--text-secondary);
+        }
+
+        /* 4. 固定底部導航 (Bottom Dock) */
+        .bottom-dock {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            padding: 16px;
             display: flex;
             justify-content: center;
-            padding: 10px;
+            z-index: 10;
         }
 
-        nav a {
-            color: white;
-            text-decoration: none;
-            margin: 0 15px;
-            font-weight: bold;
+        .dock-inner {
+            display: flex;
+            gap: 16px;
+            padding: 8px;
+            max-width: fit-content;
+            /* 讓導航條根據內容縮小 */
+            border-radius: 40px;
+            /* 導航條本身的圓角 */
+
+            /* 使用 Liquid Glass 包裹整個導航條 */
+            --border-radius: 40px;
+            /* 容器變數 */
         }
 
-        nav a:hover {
-            text-decoration: underline;
+        .dock-item {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-primary);
+            transition: transform 0.2s ease;
+            cursor: pointer;
         }
 
-        /* 主標語區 */
-        .hero {
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 20px;
-            padding: 80px 20px;
-            text-align: center;
-            color: white;
-            margin: 30px auto;
-            max-width: 900px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
-        }
-
-        .hero h1 {
-            font-size: 2.5em;
-            margin-bottom: 15px;
-        }
-
-        /* 區塊 */
-        section {
-            background: rgba(255, 255, 255, 0.25);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-radius: 20px;
-            padding: 30px;
-            max-width: 900px;
-            margin: 20px auto;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
-            color: #222;
-        }
-
-        /* 頁尾 */
-        footer {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            color: white;
-            text-align: center;
-            padding: 15px;
-            margin-top: 30px;
-            box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.3);
+        .dock-item:hover {
+            transform: scale(1.05);
         }
     </style>
 </head>
 
 <body>
-
-    <header>
-        <h1>張師社會主義民主共和國</h1>
-        <p>不厚道的都送民生勞動營!</p>
-    </header>
-
-    <nav>
-        <a href="#">首頁</a>
-        <a href="#">國家理念</a>
-        <a href="#">關於我們</a>
-    </nav>
-
-    <div class="hero">
-        <p>✦ 以人民為中心 ✦ 以平等為基礎 ✦</p>
+    <div class="full-bg">
+        <img src="https://plus.unsplash.com/premium_photo-1748960861503-99b1f5412a81?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwxfHx8ZW58MHx8fHx8"
+            alt="您的自選背景圖" />
     </div>
 
-    <section>
-        <h2>國家理念</h2>
-        <p>
-            我們張師社會主義民主共和國的核心精神是:厚道
-        </p>
-    </section>
+    <div class="main-container">
+        <header class="content-card">
+            <h1>張師社會主義民主共和國</h1>
+            <p>不厚道的都送民生勞動營!</p>
+        </header>
 
-    <section>
-        <h2>關於我們</h2>
-        <p>
-            張師社會主義民主共和國由資優班同學共同創立，
-            實行共產主義制度，致力於打造一個沒有階級差異、人人平等的理想國度。
-        </p>
-    </section>
+        <div class="content-card">
+            <p style="text-align: center; font-size: 20px; font-weight: 600; color: var(--accent-color);">
+                ✦ 以人民為中心 ✦ 以平等為基礎 ✦</p>
+        </div>
 
-    <footer>
-        <p>© 2025 張師社會主義民主共和國</p>
-    </footer>
+        <section class="content-card">
+            <h2>國家理念</h2>
+            <p>我們張師社會主義民主共和國的核心精神是:厚道</p>
+        </section>
 
+        <section class="content-card">
+            <h2>關於我們</h2>
+            <p>張師社會主義民主共和國由資優班同學共同創立，
+                實行共產主義制度，致力於打造一個沒有階級差異、人人平等的理想國度。</p>
+        </section>
+
+        <div class="content-card" style="text-align: center;">
+            <p style="font-size: 14px; color: var(--text-secondary);">© 2025 張師社會主義民主共和國</p>
+        </div>
+    </div>
+
+    <div class="bottom-dock">
+        <div class="liquid_glass-wrapper dock-inner" style="--border-radius: 40px;">
+            <div class="liquid_glass-outer"></div>
+            <div class="liquid_glass-cover"></div>
+            <div class="liquid_glass-sharp"></div>
+            <div class="liquid_glass-reflect"></div>
+
+            <a href="#" class="dock-item">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                    style="width: 24px; height: 24px">
+                    <path
+                        d="M12 11V19H17V11H12ZM11 13V19H7V13H11ZM4 20C4 20.5523 4.44772 21 5 21H19C19.5523 21 20 20.5523 20 20V11L12 3L4 11V20Z">
+                    </path>
+                </svg>
+            </a>
+
+            <a href="#" class="dock-item">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                    style="width: 24px; height: 24px">
+                    <path
+                        d="M17 21H7C4.79086 21 3 19.2091 3 17V7C3 4.79086 4.79086 3 7 3H17C19.2091 3 21 4.79086 21 7V17C21 19.2091 19.2091 21 17 21ZM12 7C9.23858 7 7 9.23858 7 12C7 14.7614 9.23858 17 12 17C14.7614 17 17 14.7614 17 12C17 9.23858 14.7614 7 12 7Z">
+                    </path>
+                </svg>
+            </a>
+
+            <a href="#" class="dock-item">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                    style="width: 24px; height: 24px">
+                    <path
+                        d="M12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2ZM14.9984 8.24354C13.4357 8.24354 12.1643 9.51493 12.1643 11.0776V14.1953H9.83574V11.0776C9.83574 8.16335 12.1643 5.83472 15.0785 5.83472C17.9927 5.83472 20.3214 8.16335 20.3214 11.0776V14.1953H18.0016V11.0776C18.0016 9.51493 16.7302 8.24354 15.1675 8.24354H14.9984Z">
+                    </path>
+                </svg>
+            </a>
+        </div>
+    </div>
 </body>
 
 </html>
