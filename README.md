@@ -1,1 +1,1 @@
-# zssdmrofficial.github.io
+https://www.zssdmr.dpdns.org
