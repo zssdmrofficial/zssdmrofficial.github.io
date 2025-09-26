@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <link rel="stylesheet" href="static/css/style.css" />
-
+    <link rel="stylesheet" href="static/css/chat.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -61,6 +61,35 @@
             <p style="font-size: 14px; color: var(--text-secondary);">© 2025 張師社會主義民主共和國</p>
         </div>
     </div>
+
+    <div id="chat-toggle" class="chat-toggle-button">
+        💬
+    </div>
+
+    <div id="chat-widget" class="chat-widget-container">
+
+        <div class="liquid_glass-wrapper chat-wrapper">
+            <div class="liquid_glass-outer"></div>
+            <div class="liquid_glass-cover"></div>
+            <div class="liquid_glass-reflect"></div>
+            <div class="liquid_glass-sharp"></div>
+
+            <div class="chat-content">
+                <div class="chat-header">
+                    思想小助手
+                </div>
+
+                <div id="chat-box" class="chat-box"></div>
+
+                <div class="chat-input-area">
+                    <input id="user-input" type="text" placeholder="輸入訊息..." class="chat-input">
+                    <button id="send-button" class="chat-send-button">送出</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="static/js/chat.js"></script>
 </body>
 
 </html>
