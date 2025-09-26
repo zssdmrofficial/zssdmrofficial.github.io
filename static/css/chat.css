@@ -138,3 +138,67 @@ AI 聊天小助手 (Chat Widget) 樣式
 .chat-send-button:hover {
     background: #c2d1ff;
 }
+
+/* 程式碼區塊容器樣式 */
+.code-container {
+    position: relative;
+    /* 為了讓複製按鈕能精確定位 */
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    /* 邊框 */
+    border-radius: 4px;
+    background-color: #f6f8fa;
+    /* 淺灰色背景 */
+    overflow: hidden;
+    /* 確保內容不溢出 */
+}
+
+/* 程式碼區塊樣式 */
+.code-container pre {
+    margin: 0;
+    padding: 15px;
+    overflow-x: auto;
+    /* 允許橫向滾動 */
+}
+
+/* 程式碼內容樣式 - 確保文字為深色，在淺色背景上清晰可見 */
+.code-container code {
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 14px;
+    display: block;
+    /* 讓 <code> 佔據整行 */
+    color: #24292e;
+    /* 關鍵：強制使用深色文字 */
+}
+
+/* 複製按鈕樣式 - 調整為主題色 */
+.copy-button {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    padding: 3px 8px;
+    background-color: var(--accent-color);
+    /* 修正：使用主題色 */
+    color: #1a1a1a;
+    /* 修正：按鈕文字使用深色 */
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+    opacity: 0.9;
+    transition: opacity 0.2s, background-color 0.2s;
+}
+
+.copy-button:hover {
+    opacity: 1;
+    background-color: #c2d1ff;
+    /* 修正：使用 hover 顏色 */
+}
+
+.inline-code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+}
