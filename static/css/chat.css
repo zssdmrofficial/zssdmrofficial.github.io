@@ -1,3 +1,22 @@
+/* 新增 CSS Keyframes */
+@keyframes shake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    20%,
+    60% {
+        transform: translateX(-5px);
+    }
+
+    40%,
+    80% {
+        transform: translateX(5px);
+    }
+}
+
 .chat-toggle-button {
     position: fixed;
     bottom: 20px;
@@ -6,7 +25,8 @@
     height: 60px;
     border-radius: 50%;
     background: var(--accent-color);
-    color: var(--text-primary);
+    color: #1a1a1a;
+    /* 顏色改為深色 */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -14,12 +34,16 @@
     cursor: pointer;
     z-index: 9999;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
-    transition: transform 0.2s, background 0.2s;
+    transition: transform 0.3s ease, background 0.3s ease;
+    /* 更平滑的過渡 */
 }
 
 .chat-toggle-button:hover {
-    transform: scale(1.05);
+    transform: scale(1.1);
+    /* 放大更多 */
     background: #c2d1ff;
+    box-shadow: 0 0 20px rgba(176, 196, 255, 0.8);
+    /* 新增發光效果 */
 }
 
 .chat-widget-container {
@@ -62,7 +86,7 @@
     overflow-y: auto;
     font-size: 14px;
     color: var(--text-primary);
-    background: rgba(0, 0, 0, 0.2);
+    background: rgb(112, 112, 112);
 }
 
 .chat-box p {
@@ -81,7 +105,7 @@
 .chat-input-area {
     display: flex;
     border-top: 1px solid rgba(255, 255, 255, 0.2);
-    background: rgba(0, 0, 0, 0.3);
+    background: rgba(112, 112, 112);
 }
 
 .chat-input {
@@ -92,6 +116,12 @@
     background: transparent;
     color: var(--text-primary);
     outline: none;
+}
+
+.chat-input.shake {
+    animation: shake 0.5s;
+    /* 錯誤時震動 */
+    border: 1px solid red;
 }
 
 .chat-input::placeholder {
@@ -105,11 +135,17 @@
     border: none;
     padding: 10px 15px;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: background 0.2s, transform 0.1s;
+    /* 新增過渡 */
 }
 
 .chat-send-button:hover {
     background: #c2d1ff;
+}
+
+.chat-send-button:active {
+    transform: scale(0.95);
+    /* 按下縮小 */
 }
 
 .code-container {

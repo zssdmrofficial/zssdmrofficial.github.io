@@ -122,30 +122,45 @@ function displayInitialMessage() {
     if (!initial) return;
     const html = markdownToHtml(initial);
     chatBoxEl.innerHTML += `<p><b>小助手:</b> ${html}</p>`;
-    chatBoxEl.scrollTop = chatBoxEl.scrollHeight;
+    // 使用平滑滾動
+    chatBoxEl.scrollTo({ top: chatBoxEl.scrollHeight, behavior: 'smooth' });
     addCopyButtons();
 }
 
 function renderMessage(role, content, isError = false) {
     const who = role === "user" ? "你" : "小助手";
     let html;
+
+    // 創建新的 p 元素
+    const messageEl = document.createElement('p');
+
     if (isError) {
         html = escapeHtml(content);
-        chatBoxEl.innerHTML += `<p style="color:var(--accent-color);"><b>${who} (錯誤):</b> ${html}</p>`;
+        messageEl.style.color = "var(--accent-color)";
+        messageEl.innerHTML = `<b>${who} (錯誤):</b> ${html}`;
     } else if (role === "user") {
         html = escapeHtml(content);
-        chatBoxEl.innerHTML += `<p><b>${who}:</b> ${html}</p>`;
+        messageEl.innerHTML = `<b>${who}:</b> ${html}`;
     } else {
         html = markdownToHtml(content);
-        chatBoxEl.innerHTML += `<p><b>${who}:</b> ${html}</p>`;
+        messageEl.innerHTML = `<b>${who}:</b> ${html}`;
         addCopyButtons();
     }
-    chatBoxEl.scrollTop = chatBoxEl.scrollHeight;
+
+    chatBoxEl.appendChild(messageEl);
+
+    // 使用平滑滾動確保看到最新訊息
+    chatBoxEl.scrollTo({ top: chatBoxEl.scrollHeight, behavior: 'smooth' });
 }
 
 async function sendMessage() {
     const text = inputEl.value.trim();
-    if (!text) return;
+    if (!text) {
+        // 沒有輸入文字時，加入震動動畫
+        inputEl.classList.add('shake');
+        setTimeout(() => inputEl.classList.remove('shake'), 500);
+        return;
+    }
 
     renderMessage("user", text);
     history.push({ role: "user", parts: [{ text }] });
@@ -194,11 +209,32 @@ async function sendMessage() {
 }
 
 chatToggleEl?.addEventListener("click", () => {
-    const hidden = chatWidgetEl.style.display === "none" || chatWidgetEl.style.display === "";
-    chatWidgetEl.style.display = hidden ? "block" : "none";
-    if (hidden) {
+    const isHidden = chatWidgetEl.style.display === "none" || chatWidgetEl.style.display === "";
+
+    if (isHidden) {
+        // 顯示時加入淡入和微移效果
+        chatWidgetEl.style.opacity = '0';
+        chatWidgetEl.style.transform = 'translateY(10px) scale(0.95)';
+        chatWidgetEl.style.transition = 'opacity 0.3s ease-out, transform 0.3s ease-out';
+        chatWidgetEl.style.display = "block";
+        setTimeout(() => {
+            chatWidgetEl.style.opacity = '1';
+            chatWidgetEl.style.transform = 'translateY(0) scale(1)';
+        }, 10); // 讓瀏覽器先渲染 display: block
+
         inputEl.focus();
         displayInitialMessage();
+    } else {
+        // 隱藏時加入淡出和微移效果
+        chatWidgetEl.style.opacity = '0';
+        chatWidgetEl.style.transform = 'translateY(10px) scale(0.95)';
+        setTimeout(() => {
+            chatWidgetEl.style.display = "none";
+            // 重置樣式以備下次打開
+            chatWidgetEl.style.opacity = '';
+            chatWidgetEl.style.transform = '';
+            chatWidgetEl.style.transition = '';
+        }, 300); // 等待淡出動畫完成
     }
 });
 
