@@ -1,21 +1,13 @@
-/* ===============================
-主題變數：UI 組件化與顏色定義
-=============================== */
 :root {
     --bg-dark-overlay: rgba(0, 0, 0, 0.55);
-    /* 深色圖片遮罩，略微加深 */
     --content-bg: rgba(255, 255, 255, 0.03);
-    /* 內容區塊背景 */
     --text-primary: #ffffff;
     --text-secondary: rgba(255, 255, 255, 0.75);
     --accent-color: #b0c4ff;
-    /* 柔和的 UI 藍 */
     --radius-ui: 24px;
-    /* UI 圓角 */
     --maxw-content: 700px;
 }
 
-/* 全局設定 */
 * {
     box-sizing: border-box;
 }
@@ -25,7 +17,6 @@ body {
     color: var(--text-primary);
     font-family: "Noto Sans TC", "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     background-color: #000;
-    /* fallback */
 }
 
 p {
@@ -33,7 +24,6 @@ p {
     line-height: 1.7;
 }
 
-/* 1. 全屏背景與遮罩 */
 .full-bg {
     position: fixed;
     top: 0;
@@ -49,9 +39,7 @@ p {
     height: 100%;
     object-fit: cover;
     filter: brightness(60%) grayscale(20%) blur(2px);
-    /* 【調整】亮度降低，新增微模糊 */
     transform: scale(1.03);
-    /* 微放大防止邊緣露餡 */
 }
 
 .full-bg::after {
@@ -60,23 +48,18 @@ p {
     inset: 0;
     background: var(--bg-dark-overlay);
     z-index: -1;
-    /* 增加一層深色遮罩 */
 }
 
-/* 2. 核心 Liquid Glass 組件 */
 .liquid_glass-wrapper {
     position: relative;
     display: flex;
     overflow: hidden;
     border-radius: var(--border-radius);
     isolation: isolate;
-    /* 確保層次正確 */
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    /* 新增柔和陰影 */
 }
 
 .liquid_glass-outer {
-    /* 應用 SVG 濾鏡產生液態失真效果 */
     backdrop-filter: url(#liquid_glass_filter);
     position: absolute;
     inset: 0;
@@ -86,7 +69,6 @@ p {
 }
 
 .liquid_glass-cover {
-    /* 負責半透明背景和主要的模糊效果 */
     backdrop-filter: blur(28px) saturate(180%);
     -webkit-backdrop-filter: blur(28px) saturate(180%);
     position: absolute;
@@ -94,32 +76,25 @@ p {
     z-index: 2;
     border-radius: var(--border-radius);
     background: rgba(255, 255, 255, 0.05);
-    /* 更淡更透明 */
     border: 1px solid rgba(255, 255, 255, 0.15);
-    /* 新增輕微邊框 */
 }
 
 .liquid_glass-sharp {
-    /* 銳利光影/邊緣高光 */
     position: absolute;
     inset: 0;
     z-index: 3;
     box-shadow: inset 1px 1px 0px 0px rgba(255, 255, 255, 0.4),
         inset -1px -1px 0px 0px rgba(255, 255, 255, 0.3);
-    /* 調整光影強度，更細膩 */
     border-radius: var(--border-radius);
     pointer-events: none;
 }
 
 .liquid_glass-reflect {
-    /* 內部柔和反光（液體感） */
     position: absolute;
     inset: 1px;
     z-index: 2;
     box-shadow: inset 0 0 10px 0 rgba(255, 255, 255, 0.1);
-    /* 柔和內部光暈 */
     background: radial-gradient(100% 100% at -5% -5%, rgba(255, 255, 255, 0.2), transparent 40%);
-    /* 左上角亮帶 */
     border-radius: var(--border-radius);
     pointer-events: none;
     mix-blend-mode: screen;
@@ -133,16 +108,13 @@ p {
     justify-content: center;
 }
 
-/* 3. 內容佈局 */
 .main-container {
     width: 100%;
     max-width: var(--maxw-content);
     margin: 40px auto 120px;
-    /* 底部預留給固定導航 */
     padding: 0 20px;
 }
 
-/* 內容卡片樣式 */
 .content-card {
     background: var(--content-bg);
     backdrop-filter: blur(5px);
@@ -179,7 +151,6 @@ section p {
     color: var(--text-secondary);
 }
 
-/* 4. 固定底部導航 (Bottom Dock) */
 .bottom-dock {
     position: fixed;
     bottom: 0;
@@ -195,13 +166,8 @@ section p {
     gap: 16px;
     padding: 8px;
     max-width: fit-content;
-    /* 讓導航條根據內容縮小 */
     border-radius: 40px;
-    /* 導航條本身的圓角 */
-
-    /* 使用 Liquid Glass 包裹整個導航條 */
     --border-radius: 40px;
-    /* 容器變數 */
 }
 
 .dock-item {

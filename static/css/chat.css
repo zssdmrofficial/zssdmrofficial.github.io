@@ -1,9 +1,3 @@
-/* ===============================
-AI 聊天小助手 (Chat Widget) 樣式
-遵循 Liquid Glass 風格
-=============================== */
-
-/* 浮動小圓按鈕 */
 .chat-toggle-button {
     position: fixed;
     bottom: 20px;
@@ -11,7 +5,6 @@ AI 聊天小助手 (Chat Widget) 樣式
     width: 60px;
     height: 60px;
     border-radius: 50%;
-    /* 使用網站主色作為按鈕背景 */
     background: var(--accent-color);
     color: var(--text-primary);
     display: flex;
@@ -20,19 +13,15 @@ AI 聊天小助手 (Chat Widget) 樣式
     font-size: 24px;
     cursor: pointer;
     z-index: 9999;
-    /* 輕微按鈕陰影 */
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
     transition: transform 0.2s, background 0.2s;
 }
 
 .chat-toggle-button:hover {
     transform: scale(1.05);
-    /* 懸停輕微變色 */
     background: #c2d1ff;
 }
 
-
-/* 聊天框容器 */
 .chat-widget-container {
     position: fixed;
     bottom: 90px;
@@ -40,20 +29,15 @@ AI 聊天小助手 (Chat Widget) 樣式
     width: 320px;
     height: 400px;
     display: none;
-    /* 預設隱藏 */
     z-index: 9998;
 }
 
-/* 聊天框內的 Liquid Glass 容器調整 */
 .chat-wrapper {
-    /* Liquid Glass 容器設定為 100% 填滿父容器 */
     width: 100%;
     height: 100%;
     --border-radius: var(--radius-ui);
-    /* 繼承網站圓角 */
 }
 
-/* 聊天內容區塊，確保文字在玻璃效果之上 */
 .chat-content {
     position: relative;
     z-index: 4;
@@ -65,28 +49,22 @@ AI 聊天小助手 (Chat Widget) 樣式
     border-radius: var(--radius-ui);
 }
 
-/* 聊天框頭部 */
 .chat-header {
     background: var(--accent-color);
     color: #1a1a1a;
-    /* 頭部文字使用深色，突出顯示 */
     font-weight: 700;
     padding: 12px 15px;
-    /* 頂部圓角已由 .chat-content 提供 */
 }
 
-/* 訊息顯示區 */
 .chat-box {
     flex: 1;
     padding: 10px 15px;
     overflow-y: auto;
     font-size: 14px;
     color: var(--text-primary);
-    /* 聊天區塊的背景可以更透明一點，讓背景圖片更清晰 */
     background: rgba(0, 0, 0, 0.2);
 }
 
-/* 訊息樣式 */
 .chat-box p {
     margin-bottom: 8px;
     word-wrap: break-word;
@@ -100,16 +78,12 @@ AI 聊天小助手 (Chat Widget) 樣式
     margin-bottom: 0;
 }
 
-
-/* 輸入區 */
 .chat-input-area {
     display: flex;
     border-top: 1px solid rgba(255, 255, 255, 0.2);
-    /* 輸入區分隔線 */
     background: rgba(0, 0, 0, 0.3);
 }
 
-/* 輸入框 */
 .chat-input {
     flex: 1;
     border: none;
@@ -124,7 +98,6 @@ AI 聊天小助手 (Chat Widget) 樣式
     color: var(--text-secondary);
 }
 
-/* 送出按鈕 */
 .chat-send-button {
     background: var(--accent-color);
     color: #1a1a1a;
@@ -139,48 +112,35 @@ AI 聊天小助手 (Chat Widget) 樣式
     background: #c2d1ff;
 }
 
-/* 程式碼區塊容器樣式 */
 .code-container {
     position: relative;
-    /* 為了讓複製按鈕能精確定位 */
     margin: 10px 0;
     border: 1px solid #ccc;
-    /* 邊框 */
     border-radius: 4px;
     background-color: #f6f8fa;
-    /* 淺灰色背景 */
     overflow: hidden;
-    /* 確保內容不溢出 */
 }
 
-/* 程式碼區塊樣式 */
 .code-container pre {
     margin: 0;
     padding: 15px;
     overflow-x: auto;
-    /* 允許橫向滾動 */
 }
 
-/* 程式碼內容樣式 - 確保文字為深色，在淺色背景上清晰可見 */
 .code-container code {
     font-family: 'Consolas', 'Courier New', monospace;
     font-size: 14px;
     display: block;
-    /* 讓 <code> 佔據整行 */
     color: #24292e;
-    /* 關鍵：強制使用深色文字 */
 }
 
-/* 複製按鈕樣式 - 調整為主題色 */
 .copy-button {
     position: absolute;
     top: 5px;
     right: 5px;
     padding: 3px 8px;
     background-color: var(--accent-color);
-    /* 修正：使用主題色 */
     color: #1a1a1a;
-    /* 修正：按鈕文字使用深色 */
     border: none;
     border-radius: 3px;
     cursor: pointer;
@@ -192,7 +152,6 @@ AI 聊天小助手 (Chat Widget) 樣式
 .copy-button:hover {
     opacity: 1;
     background-color: #c2d1ff;
-    /* 修正：使用 hover 顏色 */
 }
 
 .inline-code {
