@@ -92,8 +92,7 @@ const SYSTEM_INSTRUCTION = `
 10. 新蘇維埃（消滅趙國共產黨，聯合各族各省各式，兩岸三地同胞創建新蘇維埃聯邦。見張國語錄紙本、電子檔）
 11. 聲援藏獨（聲援西藏獨立爭取民族自決。見張國語錄紙本、電子檔）
 ================================================
-`
-
+`;
 
 let history = [
     {
@@ -209,7 +208,6 @@ function displayInitialMessage() {
     if (!initial) return;
     const html = markdownToHtml(initial);
     chatBoxEl.innerHTML += `<p><b>小助手:</b> ${html}</p>`;
-    // 使用平滑滾動
     chatBoxEl.scrollTo({ top: chatBoxEl.scrollHeight, behavior: 'smooth' });
     addCopyButtons();
 }
@@ -218,7 +216,6 @@ function renderMessage(role, content, isError = false) {
     const who = role === "user" ? "你" : "小助手";
     let html;
 
-    // 創建新的 p 元素
     const messageEl = document.createElement('p');
 
     if (isError) {
@@ -236,14 +233,12 @@ function renderMessage(role, content, isError = false) {
 
     chatBoxEl.appendChild(messageEl);
 
-    // 使用平滑滾動確保看到最新訊息
     chatBoxEl.scrollTo({ top: chatBoxEl.scrollHeight, behavior: 'smooth' });
 }
 
 async function sendMessage() {
     const text = inputEl.value.trim();
     if (!text) {
-        // 沒有輸入文字時，加入震動動畫
         inputEl.classList.add('shake');
         setTimeout(() => inputEl.classList.remove('shake'), 500);
         return;
@@ -256,7 +251,6 @@ async function sendMessage() {
     inputEl.disabled = true;
     sendButtonEl.disabled = true;
 
-    // === 新增：顯示「回應中...」 ===
     const loadingEl = document.createElement("p");
     loadingEl.id = "loading-message";
     loadingEl.innerHTML = `<b>小助手:</b> <i>思想小助手回應中...</i>`;
@@ -276,7 +270,6 @@ async function sendMessage() {
         }
 
         const data = await res.json();
-        // 移除「回應中」提示
         document.getElementById("loading-message")?.remove();
 
         if (data.candidates?.length) {
@@ -297,7 +290,6 @@ async function sendMessage() {
         }
     } catch (e) {
         console.error(e);
-        // 移除「回應中」提示
         document.getElementById("loading-message")?.remove();
         renderMessage("model", `請求失敗: ${e.message}`, true);
     } finally {
@@ -308,12 +300,10 @@ async function sendMessage() {
 }
 
 
-
 chatToggleEl?.addEventListener("click", () => {
     const isHidden = chatWidgetEl.style.display === "none" || chatWidgetEl.style.display === "";
 
     if (isHidden) {
-        // 顯示時加入淡入和微移效果
         chatWidgetEl.style.opacity = '0';
         chatWidgetEl.style.transform = 'translateY(10px) scale(0.95)';
         chatWidgetEl.style.transition = 'opacity 0.3s ease-out, transform 0.3s ease-out';
@@ -321,21 +311,19 @@ chatToggleEl?.addEventListener("click", () => {
         setTimeout(() => {
             chatWidgetEl.style.opacity = '1';
             chatWidgetEl.style.transform = 'translateY(0) scale(1)';
-        }, 10); // 讓瀏覽器先渲染 display: block
+        }, 10);
 
         inputEl.focus();
         displayInitialMessage();
     } else {
-        // 隱藏時加入淡出和微移效果
         chatWidgetEl.style.opacity = '0';
         chatWidgetEl.style.transform = 'translateY(10px) scale(0.95)';
         setTimeout(() => {
             chatWidgetEl.style.display = "none";
-            // 重置樣式以備下次打開
             chatWidgetEl.style.opacity = '';
             chatWidgetEl.style.transform = '';
             chatWidgetEl.style.transition = '';
-        }, 300); // 等待淡出動畫完成
+        }, 300);
     }
 });
 

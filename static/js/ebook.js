@@ -1,7 +1,7 @@
 const quotesImages = [
-    "static/images/張國語錄/封面.jpg",   // 封面
-    "static/images/張國語錄/內頁.jpg",   // 內頁
-    "static/images/張國語錄/目錄.jpg",   // 目錄
+    "static/images/張國語錄/封面.jpg",
+    "static/images/張國語錄/內頁.jpg",
+    "static/images/張國語錄/目錄.jpg",
     "static/images/張國語錄/1.jpg",
     "static/images/張國語錄/2.jpg",
     "static/images/張國語錄/3.jpg",
@@ -26,8 +26,8 @@ const quotesImages = [
     "static/images/張國語錄/23.jpg",
     "static/images/張國語錄/24.jpg",
     "static/images/張國語錄/25.jpg",
-    "static/images/張國語錄/版權頁.jpg", // 版權頁
-    "static/images/張國語錄/封底.jpg"    // 封底
+    "static/images/張國語錄/版權頁.jpg",
+    "static/images/張國語錄/封底.jpg"
 ];
 
 let currentIndex = 0;
@@ -38,7 +38,6 @@ function showImage(index) {
     currentIndex = index;
     quotesImg.src = quotesImages[currentIndex];
 
-    // 去掉副檔名
     const parts = quotesImages[currentIndex].split("/");
     let filename = parts[parts.length - 1].replace(/\.(jpg|jpeg|png)$/i, "");
     document.getElementById("page-indicator").textContent = filename;
@@ -52,10 +51,8 @@ function showNextImage() {
     if (currentIndex < quotesImages.length - 1) showImage(currentIndex + 1);
 }
 
-// 初始化顯示封面
 showImage(0);
 
-// 鍵盤控制
 window.addEventListener("keydown", (e) => {
     if (e.key === "ArrowLeft") showPrevImage();
     if (e.key === "ArrowRight") showNextImage();

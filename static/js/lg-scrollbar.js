@@ -1,4 +1,4 @@
-/* 自製 Liquid Glass 虛擬捲動軸（可重複實例：主頁面 + 聊天室） */
+/* 自製 Liquid Glass 虛擬捲動軸（可重複實例：主頁面 + 聊天室 + 張國語錄文字版） */
 (function () {
     'use strict';
 
@@ -109,7 +109,6 @@
         }
 
         // === 事件 ===
-        // 滾輪
         const wheelHandler = (e) => {
             e.preventDefault();
             if (stopBubbleOnWheel) e.stopPropagation();
@@ -120,12 +119,11 @@
         };
         root.addEventListener('wheel', wheelHandler, { passive: false });
 
-        // 鍵盤（輸入框內不攔）
+        // 鍵盤
         window.addEventListener('keydown', (e) => {
             const ae = document.activeElement;
             if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA' || ae.isContentEditable)) return;
 
-            // 僅當滑鼠目前在此 root 上或 root 聚焦時，才處理鍵盤
             const hovered = root.matches(':hover');
             if (!hovered) return;
 
@@ -159,15 +157,12 @@
             if (stopBubbleOnWheel) e.stopPropagation();
         }, { passive: true });
 
-        // 軌道點擊（空白處翻頁）
+        // 軌道點擊
         track.addEventListener('mousedown', (e) => {
             if (e.target === thumb) return;
             const rect = track.getBoundingClientRect();
             const y = e.clientY - rect.top;
             const thumbRect = thumb.getBoundingClientRect();
-            const insideThumb = (e.clientY >= thumbRect.top && e.clientY <= thumbRect.bottom);
-            if (insideThumb) return;
-
             if (y < thumbRect.top - rect.top) {
                 setTarget(targetY - viewportH * 0.9);
             } else {
@@ -199,7 +194,7 @@
             maybeAutoHideSoon();
         });
 
-        // 觀測尺寸與內容
+        // ResizeObserver
         window.addEventListener('resize', measure);
         const ro = new ResizeObserver(measure);
         ro.observe(content);
@@ -209,7 +204,6 @@
         applyScrollImmediate(0);
         maybeAutoHideSoon();
 
-        // 對外 API
         return {
             measure,
             scrollTo: (y) => setTarget(y),
@@ -242,24 +236,33 @@
         bar: chatRoot ? chatRoot.querySelector('.lg-scrollbar--chat') : null,
         track: chatRoot ? chatRoot.querySelector('.lg-scrollbar--chat .lg-scrollbar-track') : null,
         thumb: chatRoot ? chatRoot.querySelector('.lg-scrollbar--chat .lg-scrollbar-thumb') : null,
-        stopBubbleOnWheel: true, // ✅ 重要：避免冒泡到主頁面
+        stopBubbleOnWheel: true,
         minThumb: 24,
     });
 
-    // 如果聊天室存在：監聽訊息新增，自動滾到底
+    // ==== 張國語錄文字版實例 ====
+    const quotesRoot = document.getElementById('quotes-text-root');
+    const quotes = createLGScroll({
+        root: quotesRoot,
+        content: quotesRoot ? quotesRoot.querySelector('.lg-scroll-content') : null,
+        bar: quotesRoot ? quotesRoot.querySelector('.lg-scrollbar') : null,
+        track: quotesRoot ? quotesRoot.querySelector('.lg-scrollbar .lg-scrollbar-track') : null,
+        thumb: quotesRoot ? quotesRoot.querySelector('.lg-scrollbar .lg-scrollbar-thumb') : null,
+        stopBubbleOnWheel: false,
+    });
+
+    // 聊天室自動滾到底
     (function autoStickBottom() {
         if (!chatRoot || !chat) return;
         const chatBox = document.getElementById('chat-box');
         if (!chatBox) return;
 
         const mo = new MutationObserver(() => {
-            // 內容改變後量測並滾到底
             chat.measure();
             chat.scrollToEnd();
         });
         mo.observe(chatBox, { childList: true, subtree: true, characterData: true });
 
-        // 第一次顯示聊天室時也量測一下（若是切換顯示）
         const widget = document.getElementById('chat-widget');
         if (widget) {
             const io = new IntersectionObserver(() => {
@@ -269,6 +272,6 @@
         }
     })();
 
-    // 對外暴露（非必須，但有助除錯）
-    window.LGScroll = { main, chat };
+    // 對外暴露
+    window.LGScroll = { main, chat, quotes };
 })();

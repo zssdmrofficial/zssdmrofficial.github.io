@@ -1,28 +1,16 @@
-/* ------------------------------------------------------------
-   Chat UI（含額外毛玻璃模糊層 + 深度訊息氣泡）
-   ------------------------------------------------------------ */
-
-/* 1) 聊天室專用變數：可微調整體/氣泡模糊強度與色調 */
 :root {
-    /* 整體聊天室額外模糊層 */
     --chat-blur: 50px;
-    /* 訊息氣泡的更深模糊 */
     --chat-blur-deep: 100px;
-
-    /* 玻璃色調 */
     --chat-glass-bg: rgba(255, 255, 255, 0.05);
     --chat-glass-bg-strong: rgba(255, 255, 255, 0.7);
     --chat-border: rgba(255, 255, 255, 0.14);
     --chat-border-strong: rgba(255, 255, 255, 0.18);
-
-    /* 滑軸預設（保留） */
     --scrollbar-thumb-fallback: #b0c4ff;
     --scrollbar-thumb-hover-fallback: #b0c4ff;
     --scrollbar-track: rgba(255, 255, 255, 0.06);
     --scrollbar-glow: rgba(176, 196, 255, 0.35);
 }
 
-/* 2) 既有 Keyframes（保留） */
 @keyframes shake {
 
     0%,
@@ -41,7 +29,6 @@
     }
 }
 
-/* 3) 浮動開關按鈕（保留） */
 .chat-toggle-button {
     position: fixed;
     bottom: 20px;
@@ -67,7 +54,6 @@
     box-shadow: 0 0 20px rgba(176, 196, 255, 0.8);
 }
 
-/* 4) 聊天室外框（保留） */
 .chat-widget-container {
     position: fixed;
     bottom: 90px;
@@ -84,11 +70,9 @@
     --border-radius: var(--radius-ui);
 }
 
-/* 5) 內容層：新增 ::before 作為「額外模糊覆蓋層」 */
 .chat-content {
     position: relative;
     z-index: 4;
-    /* 置於 liquid_glass-cover/reflect 之上，維持原結構 */
     width: 100%;
     height: 100%;
     display: flex;
@@ -97,7 +81,6 @@
     border-radius: var(--radius-ui);
 }
 
-/* ✅ 這層會在你的 Liquid Glass 之上、訊息與輸入列之下，達成「疊加模糊」 */
 .chat-content::before {
     content: "";
     position: absolute;
@@ -113,13 +96,11 @@
     box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
 }
 
-/* 讓真正內容在 ::before 之上 */
 .chat-content>* {
     position: relative;
     z-index: 1;
 }
 
-/* 6) 標題列（保留配色，略帶玻璃感） */
 .chat-header {
     background: var(--accent-color);
     color: rgba(88, 86, 86, 1);
@@ -128,12 +109,10 @@
     border-bottom: 1px solid rgba(0, 0, 0, 0.12);
 }
 
-/* 7) 虛擬捲動根（保留） */
 .chat-scroll-root {
     position: relative;
     flex: 1;
     overflow: hidden;
-    /* 由 JS 虛擬捲動 */
 }
 
 .chat-scroll-content {
@@ -143,7 +122,6 @@
     transform: translate3d(0, 0, 0);
 }
 
-/* 8) 訊息容器：將整體背景改為透明薄霧，真正的「深模糊」放在每一則 <p> 上 */
 .chat-box {
     flex: 1;
     padding: 10px 15px;
@@ -151,34 +129,25 @@
     color: rgba(88, 86, 86, 1);
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.015));
     overscroll-behavior: contain;
-
-    /* 舊原生捲動外觀（保留，雖不再使用） */
     scrollbar-width: thin;
     scrollbar-color: var(--scrollbar-thumb, var(--scrollbar-thumb-fallback)) var(--scrollbar-track);
 }
 
-/* ✅ 單則訊息 = 玻璃氣泡（更深模糊） */
 .chat-box p {
     margin: 10px 0;
     padding: 10px 12px;
     line-height: 1.6;
     word-wrap: break-word;
-
     background: var(--chat-glass-bg-strong);
     border: 1px solid var(--chat-border-strong);
     border-radius: 14px;
-
-    /* 深一階毛玻璃 */
     backdrop-filter: blur(var(--chat-blur-deep)) saturate(170%);
     -webkit-backdrop-filter: blur(var(--chat-blur-deep)) saturate(170%);
-
-    /* 微光影 */
     box-shadow:
         inset 0 1px 0 rgba(255, 255, 255, 0.25),
         0 6px 18px rgba(0, 0, 0, 0.25);
 }
 
-/* 首末訊息微調距 */
 .chat-box p:first-child {
     margin-top: 6px;
 }
@@ -187,12 +156,10 @@
     margin-bottom: 6px;
 }
 
-/* 強調「你/小助手」標籤的可讀性 */
 .chat-box b {
     color: #b0c4ff;
 }
 
-/* 9) 輸入區：同步帶薄玻璃感（與整體一致） */
 .chat-input-area {
     display: flex;
     border-top: 1px solid rgba(255, 255, 255, 0.2);
@@ -209,12 +176,7 @@
     background: transparent;
     color: rgb(255, 255, 255);
     outline: none;
-
-    /* ✅ 新增這一行：設定字體粗細 */
     font-weight: bold;
-
-    /* 也可以使用數值，例如 700 或 600 */
-    /* font-weight: 700; */
 }
 
 .chat-input.shake {
@@ -244,7 +206,6 @@
     transform: scale(0.95);
 }
 
-/* 10) 程式碼方塊：調成輕玻璃風格以融入深色主題 */
 .code-container {
     position: relative;
     margin: 10px 0;
@@ -252,7 +213,6 @@
     background: rgba(255, 255, 255, 0.06);
     border: 1px solid rgba(255, 255, 255, 0.12);
     overflow: hidden;
-
     backdrop-filter: blur(calc(var(--chat-blur) - 2px)) saturate(160%);
     -webkit-backdrop-filter: blur(calc(var(--chat-blur) - 2px)) saturate(160%);
 }
@@ -298,7 +258,6 @@
     border: 1px solid rgba(255, 255, 255, 0.16);
 }
 
-/* 11) 進場動畫（保留） */
 @keyframes slideInFromBottom {
     0% {
         opacity: 0;
@@ -316,7 +275,6 @@
     animation: slideInFromBottom 0.5s ease-out forwards;
 }
 
-/* 12) 舊原生捲動 hover 視覺（保留以便回退） */
 .chat-box:hover::-webkit-scrollbar-thumb {
     background-image:
         linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.20)),
@@ -327,7 +285,6 @@
         0 0 18px var(--scrollbar-glow);
 }
 
-/* 13) 聊天室專用 LG 滾動軸（原樣保留） */
 .lg-scrollbar--chat {
     position: absolute;
     top: 6px;
@@ -336,7 +293,6 @@
     width: 12px;
     z-index: 10;
     pointer-events: none;
-    /* 只有子元素可互動 */
     opacity: 0;
     transition: opacity .25s ease;
 }
@@ -402,7 +358,6 @@
         0 0 18px rgba(176, 196, 255, 0.6);
 }
 
-/* 14) 拖曳游標（保留） */
 html.lg-dragging,
 html.lg-dragging * {
     cursor: grabbing !important;

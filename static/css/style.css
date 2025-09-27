@@ -36,6 +36,18 @@
     }
 }
 
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
 /* ===================================================================
    3. 全局/基本樣式 (Global / Base Styles)
    =================================================================== */
@@ -49,7 +61,15 @@ body {
     font-family: "Noto Sans TC", "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     background-color: #000;
     animation: fadeIn 1s ease-out;
-    /* 頁面載入淡入效果 */
+    scrollbar-width: none;
+}
+
+body.no-native-scroll {
+    overflow: hidden;
+}
+
+body::-webkit-scrollbar {
+    display: none;
 }
 
 p {
@@ -57,14 +77,25 @@ p {
     line-height: 1.7;
 }
 
-/* Firefox 專用：隱藏捲軸 */
-body {
-    scrollbar-width: none;
+/* 無障礙隱藏文字 */
+.sr-only {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    border: 0 !important;
 }
 
-/* WebKit (Chrome, Safari) 專用：隱藏捲軸 */
-body::-webkit-scrollbar {
-    display: none;
+/* 減少動效偏好設定 */
+@media (prefers-reduced-motion: reduce) {
+
+    .lg-scrollbar,
+    .lg-scrollbar-thumb {
+        transition: none;
+    }
 }
 
 /* ===================================================================
@@ -98,10 +129,8 @@ body::-webkit-scrollbar {
 
 /* ===================================================================
    5. Liquid Glass 樣式 (Liquid Glass/Glassmorphism Styles)
-   --- 適用於 chat-widget, liquid_glass-wrapper 等 --- 
    =================================================================== */
 
-/* liquid_glass-wrapper 容器 */
 .liquid_glass-wrapper {
     position: relative;
     display: flex;
@@ -111,7 +140,6 @@ body::-webkit-scrollbar {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-/* 外層模糊（可能用於 SVG 濾鏡） */
 .liquid_glass-outer {
     backdrop-filter: blur(20px) saturate(180%);
     position: absolute;
@@ -119,9 +147,9 @@ body::-webkit-scrollbar {
     z-index: 0;
     border-radius: var(--border-radius);
     background: transparent;
+    pointer-events: none;
 }
 
-/* 玻璃主體：模糊與半透明背景 */
 .liquid_glass-cover {
     backdrop-filter: blur(28px) saturate(180%);
     -webkit-backdrop-filter: blur(28px) saturate(180%);
@@ -131,9 +159,9 @@ body::-webkit-scrollbar {
     border-radius: var(--border-radius);
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.15);
+    pointer-events: none;
 }
 
-/* 邊緣銳利/高光效果 */
 .liquid_glass-sharp {
     position: absolute;
     inset: 0;
@@ -144,7 +172,6 @@ body::-webkit-scrollbar {
     pointer-events: none;
 }
 
-/* 頂部反射光感 */
 .liquid_glass-reflect {
     position: absolute;
     inset: 1px;
@@ -182,11 +209,8 @@ body::-webkit-scrollbar {
     padding: 30px;
     margin-bottom: 24px;
     box-shadow: 0 2px 15px rgba(176, 196, 255, 0.1);
-    /* 增加微妙的顏色陰影 */
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    /* 新增過渡 */
     animation: slideInUp 0.6s ease-out backwards;
-    /* 新增進入動畫 */
 }
 
 /* 內容卡片動畫延遲 */
@@ -212,9 +236,7 @@ section:nth-child(4) {
 
 .content-card:hover {
     transform: translateY(-5px);
-    /* Hover 浮動效果 */
     box-shadow: 0 8px 25px rgba(176, 196, 255, 0.25);
-    /* Hover 發光效果 */
 }
 
 /* 標題樣式 */
@@ -249,22 +271,13 @@ section p {
    7. 自製虛擬捲動 (Custom Virtual Scrollbar)
    =================================================================== */
 
-/* 關閉全頁原生滾動 */
-body.no-native-scroll {
-    overflow: hidden;
-}
-
-/* 視窗容器：佔滿視口；由 JS 虛擬捲動內容 */
 .lg-scroll-root {
     position: fixed;
     inset: 0;
     overflow: hidden;
-    /* 真正隱藏原生捲動 */
     z-index: 1;
-    /* 低於聊天室浮層 */
 }
 
-/* 內容容器：由 JS 以 transform 位移 */
 .lg-scroll-content {
     position: absolute;
     inset: 0 auto auto 0;
@@ -273,7 +286,6 @@ body.no-native-scroll {
     transform: translate3d(0, 0, 0);
 }
 
-/* 捲動軌道容器 */
 .lg-scrollbar {
     position: fixed;
     top: 0;
@@ -282,7 +294,6 @@ body.no-native-scroll {
     width: 14px;
     z-index: 30;
     pointer-events: none;
-    /* 預設不攔滑鼠，只有子元素可互動 */
     opacity: 0;
     transition: opacity .25s ease;
 }
@@ -295,7 +306,6 @@ body.no-native-scroll {
     display: none;
 }
 
-/* 捲動軌道（玻璃感） */
 .lg-scrollbar-track {
     position: absolute;
     left: 0;
@@ -314,15 +324,12 @@ body.no-native-scroll {
     pointer-events: auto;
 }
 
-/* 玻璃感滑塊 */
 .lg-scrollbar-thumb {
     position: absolute;
     left: 0;
     top: 16px;
-    /* 起始位移由 JS 控制 transform */
     width: 14px;
     height: 48px;
-    /* 實際高度由 JS 設定 */
     border-radius: 999px;
     border: 3px solid transparent;
     background-clip: padding-box;
@@ -338,7 +345,6 @@ body.no-native-scroll {
     pointer-events: auto;
 }
 
-/* 滑塊拖曳狀態 */
 html.lg-dragging,
 html.lg-dragging * {
     cursor: grabbing !important;
@@ -367,32 +373,10 @@ html.lg-dragging * {
     overscroll-behavior: contain;
 }
 
-/* 減少動效偏好設定 */
-@media (prefers-reduced-motion: reduce) {
-
-    .lg-scrollbar,
-    .lg-scrollbar-thumb {
-        transition: none;
-    }
-}
-
 /* ===================================================================
-   8. 登入 UI（右上角按鈕 + 置中毛玻璃 Modal）
-   =================================================================== */
+   8. 登入 UI 樣式 (Login UI Styles)
+   =================================================================== */
 
-/* 無障礙隱藏文字 */
-.sr-only {
-    position: absolute !important;
-    width: 1px !important;
-    height: 1px !important;
-    padding: 0 !important;
-    margin: -1px !important;
-    overflow: hidden !important;
-    clip: rect(0, 0, 0, 0) !important;
-    border: 0 !important;
-}
-
-/* 右上角登入按鈕 - 移除 hover 變亮和放大效果 */
 .login-toggle-btn {
     position: fixed;
     top: 20px;
@@ -405,18 +389,14 @@ html.lg-dragging * {
     color: #1a1a1a;
     cursor: pointer;
     z-index: 10000;
-    /* 保持過渡，但效果已移除 */
     transition: background 0.25s ease, transform 0.2s ease;
 }
 
 .login-toggle-btn:hover {
     background: var(--accent-color);
-    /* 保持不變 */
     transform: scale(1);
-    /* 移除放大 */
 }
 
-/* Modal 外層 */
 .login-modal {
     position: fixed;
     inset: 0;
@@ -431,7 +411,6 @@ html.lg-dragging * {
     display: none;
 }
 
-/* 登入卡片 */
 .login-card {
     width: min(92vw, 380px);
     padding: 28px;
@@ -440,21 +419,7 @@ html.lg-dragging * {
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.15);
-
     animation: fadeInScale .25s ease-out;
-}
-
-/* 簡單淡入縮放動畫 - 保留，因為這是 Modal 進入效果，而非發光 */
-@keyframes fadeInScale {
-    from {
-        opacity: 0;
-        transform: scale(0.95);
-    }
-
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
 }
 
 .login-content h2 {
@@ -471,7 +436,6 @@ html.lg-dragging * {
     text-align: center;
 }
 
-/* 輸入框 - 移除 focus 時的強調色邊框 */
 .login-input {
     width: 100%;
     padding: 12px;
@@ -491,11 +455,9 @@ html.lg-dragging * {
 
 .login-input:focus {
     border: 1px solid rgba(255, 255, 255, 0.3);
-    /* 輕微提亮透明白邊框 */
     background: rgba(255, 255, 255, 0.08);
 }
 
-/* 登入按鈕 - 移除 hover 變亮和 active 縮放效果 */
 .login-btn {
     width: 100%;
     padding: 12px;
@@ -510,15 +472,12 @@ html.lg-dragging * {
 
 .login-btn:hover {
     background: var(--accent-color);
-    /* 保持不變 */
 }
 
 .login-btn:active {
     transform: scale(1);
-    /* 移除縮放 */
 }
 
-/* 取消按鈕 */
 .login-close-btn {
     margin-top: 10px;
     width: 100%;
@@ -535,7 +494,6 @@ html.lg-dragging * {
     background: rgba(255, 255, 255, 0.05);
 }
 
-/* 登入提示文字 */
 .login-hint {
     margin-top: 12px;
     font-size: 12px;
@@ -543,27 +501,19 @@ html.lg-dragging * {
     text-align: center;
 }
 
-/* 確保玻璃層不攔截滑鼠事件 */
-.liquid_glass-outer,
-.liquid_glass-cover,
-.liquid_glass-reflect,
-.liquid_glass-sharp {
-    pointer-events: none;
-}
+/* ===================================================================
+   9. 張國語錄/電子書樣式 (Quotes/Ebook Styles)
+   =================================================================== */
 
-/* 電子書圖片容器 */
 .quotes-container {
     width: 100%;
     max-width: 480px;
-    /* 你可以調整這個寬度 */
     height: 600px;
-    /* 固定高度，避免翻頁跳動 */
     margin: 0 auto;
     display: flex;
     align-items: center;
     justify-content: center;
     background: rgba(255, 255, 255, 0.03);
-    /* 淡淡玻璃感背景 */
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
@@ -573,11 +523,9 @@ html.lg-dragging * {
     max-width: 100%;
     max-height: 100%;
     object-fit: contain;
-    /* 保持比例 */
     display: block;
 }
 
-/* 電子書控制列 */
 .quotes-controls {
     margin-top: 14px;
     display: flex;
@@ -588,7 +536,6 @@ html.lg-dragging * {
     color: var(--text-secondary);
 }
 
-/* 翻頁按鈕 - Liquid Glass 風格 */
 .page-btn {
     padding: 8px 18px;
     font-size: 14px;
@@ -598,23 +545,75 @@ html.lg-dragging * {
     border: none;
     border-radius: 12px;
     cursor: pointer;
-
     backdrop-filter: blur(12px) saturate(150%);
     -webkit-backdrop-filter: blur(12px) saturate(150%);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
-
     transition: background 0.25s ease, transform 0.15s ease, box-shadow 0.25s ease;
 }
 
-/* hover 效果 */
 .page-btn:hover {
     background: #c2d1ff;
     transform: translateY(-2px);
     box-shadow: 0 4px 14px rgba(176, 196, 255, 0.35);
 }
 
-/* active 效果 */
 .page-btn:active {
     transform: scale(0.97);
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+.liquid-glass-link {
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: 12px;
+    backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+    background: rgba(255, 255, 255, 0.15);
+    color: var(--accent-color);
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    vertical-align: middle;
+}
+
+.liquid-glass-link:hover {
+    background: rgba(255, 255, 255, 0.25);
+    color: #fff;
+}
+
+.liquid-glass-md {
+    padding: 20px;
+    border-radius: 16px;
+    backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    line-height: 1.8;
+}
+
+.liquid-glass-md h1,
+.liquid-glass-md h2,
+.liquid-glass-md h3 {
+    color: var(--accent-color);
+    margin-top: 16px;
+    margin-bottom: 8px;
+}
+
+.liquid-glass-md p {
+    margin: 8px 0;
+}
+
+.liquid-glass-md a {
+    color: var(--accent-color);
+    text-decoration: underline;
+}
+
+.quotes-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.quotes-header h2 {
+    margin: 0;
 }
