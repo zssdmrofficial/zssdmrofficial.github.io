@@ -33,20 +33,18 @@
 </head>
 
 <body class="no-native-scroll">
-    <!-- 右上角登入按鈕 -->
     <button id="login-toggle" class="login-toggle-btn" aria-haspopup="dialog" aria-controls="login-modal"
         aria-label="開啟登入視窗">
         登入
     </button>
 
-    <!-- 登入 Modal -->
     <div id="login-modal" class="login-modal hidden" role="dialog" aria-modal="true" aria-labelledby="login-title"
         aria-describedby="login-desc">
         <div class="login-backdrop" data-close="1"></div>
+
         <div class="login-card liquid_glass-wrapper" role="document">
-            <div class="liquid_glass-outer"></div>
+
             <div class="liquid_glass-cover"></div>
-            <div class="liquid_glass-reflect"></div>
             <div class="liquid_glass-sharp"></div>
 
             <div class="login-content">
@@ -106,10 +104,21 @@
                     <div class="quotes-board">
                         <!-- 日後接入：把圖片載入到下方 img#quotes-img（或改為多張列表） -->
                         <div class="quotes-placeholder">
-                            <span>已登入 ✅　此處顯示語錄圖片（Demo 佔位）</span>
                         </div>
-                        <img id="quotes-img" alt="張國語錄圖片"
-                            style="display:none;max-width:100%;height:auto;border-radius:12px;" />
+                        <div class="quotes-container">
+                            <img id="quotes-img" alt="張國語錄圖片"
+                                style="display:none;max-width:100%;height:auto;border-radius:12px;" />
+                        </div>
+                        <div style="text-align:center; margin-top:10px;">
+                            <div class="quotes-controls">
+                                <button class="page-btn" onclick="showNextImage()">下一頁 ➡</button>
+                                <span id="page-indicator">第 1 頁 / 共 N 頁</span>
+                                <button class="page-btn" onclick="showPrevImage()">⬅ 上一頁</button>
+
+
+                            </div>
+                        </div>
+
                     </div>
                 </section>
 

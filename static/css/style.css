@@ -377,8 +377,8 @@ html.lg-dragging * {
 }
 
 /* ===================================================================
-   8. 登入 UI（右上角按鈕 + 置中毛玻璃 Modal）
-   =================================================================== */
+   8. 登入 UI（右上角按鈕 + 置中毛玻璃 Modal）
+   =================================================================== */
 
 /* 無障礙隱藏文字 */
 .sr-only {
@@ -392,7 +392,7 @@ html.lg-dragging * {
     border: 0 !important;
 }
 
-/* 右上角登入按鈕 */
+/* 右上角登入按鈕 - 移除 hover 變亮和放大效果 */
 .login-toggle-btn {
     position: fixed;
     top: 20px;
@@ -405,15 +405,15 @@ html.lg-dragging * {
     color: #1a1a1a;
     cursor: pointer;
     z-index: 10000;
-    /* 高於聊天室浮鈕 */
-    transition: background 0.25s ease, transform 0.2s ease, box-shadow .2s ease;
-    box-shadow: 0 6px 18px rgba(176, 196, 255, .35);
+    /* 保持過渡，但效果已移除 */
+    transition: background 0.25s ease, transform 0.2s ease;
 }
 
 .login-toggle-btn:hover {
-    background: #c2d1ff;
-    transform: scale(1.05);
-    box-shadow: 0 8px 24px rgba(176, 196, 255, .5);
+    background: var(--accent-color);
+    /* 保持不變 */
+    transform: scale(1);
+    /* 移除放大 */
 }
 
 /* Modal 外層 */
@@ -424,7 +424,6 @@ html.lg-dragging * {
     justify-content: center;
     align-items: center;
     background: rgba(0, 0, 0, 0.55);
-    /* 半透明遮罩 */
     z-index: 10001;
 }
 
@@ -441,11 +440,11 @@ html.lg-dragging * {
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+
     animation: fadeInScale .25s ease-out;
 }
 
-/* 簡單淡入縮放動畫 */
+/* 簡單淡入縮放動畫 - 保留，因為這是 Modal 進入效果，而非發光 */
 @keyframes fadeInScale {
     from {
         opacity: 0;
@@ -472,7 +471,7 @@ html.lg-dragging * {
     text-align: center;
 }
 
-/* 輸入框 */
+/* 輸入框 - 移除 focus 時的強調色邊框 */
 .login-input {
     width: 100%;
     padding: 12px;
@@ -491,12 +490,12 @@ html.lg-dragging * {
 }
 
 .login-input:focus {
-    border: 1px solid var(--accent-color);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-color) 30%, transparent);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    /* 輕微提亮透明白邊框 */
     background: rgba(255, 255, 255, 0.08);
 }
 
-/* 登入按鈕 */
+/* 登入按鈕 - 移除 hover 變亮和 active 縮放效果 */
 .login-btn {
     width: 100%;
     padding: 12px;
@@ -506,17 +505,17 @@ html.lg-dragging * {
     background: var(--accent-color);
     color: #1a1a1a;
     cursor: pointer;
-    transition: background .2s ease, transform .05s linear, box-shadow .2s ease;
-    box-shadow: 0 6px 18px rgba(176, 196, 255, .35);
+    transition: background .2s ease, transform .05s linear;
 }
 
 .login-btn:hover {
-    background: #c2d1ff;
-    box-shadow: 0 8px 22px rgba(176, 196, 255, .45);
+    background: var(--accent-color);
+    /* 保持不變 */
 }
 
 .login-btn:active {
-    transform: scale(.97);
+    transform: scale(1);
+    /* 移除縮放 */
 }
 
 /* 取消按鈕 */
@@ -544,10 +543,78 @@ html.lg-dragging * {
     text-align: center;
 }
 
+/* 確保玻璃層不攔截滑鼠事件 */
 .liquid_glass-outer,
 .liquid_glass-cover,
 .liquid_glass-reflect,
 .liquid_glass-sharp {
     pointer-events: none;
-    /* ✅ 禁止攔截滑鼠事件 */
+}
+
+/* 電子書圖片容器 */
+.quotes-container {
+    width: 100%;
+    max-width: 480px;
+    /* 你可以調整這個寬度 */
+    height: 600px;
+    /* 固定高度，避免翻頁跳動 */
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.03);
+    /* 淡淡玻璃感背景 */
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+}
+
+.quotes-container img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    /* 保持比例 */
+    display: block;
+}
+
+/* 電子書控制列 */
+.quotes-controls {
+    margin-top: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+/* 翻頁按鈕 - Liquid Glass 風格 */
+.page-btn {
+    padding: 8px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1a1a1a;
+    background: var(--accent-color);
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+
+    backdrop-filter: blur(12px) saturate(150%);
+    -webkit-backdrop-filter: blur(12px) saturate(150%);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+
+    transition: background 0.25s ease, transform 0.15s ease, box-shadow 0.25s ease;
+}
+
+/* hover 效果 */
+.page-btn:hover {
+    background: #c2d1ff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 14px rgba(176, 196, 255, 0.35);
+}
+
+/* active 效果 */
+.page-btn:active {
+    transform: scale(0.97);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
 }
