@@ -33,6 +33,42 @@
 </head>
 
 <body class="no-native-scroll">
+    <!-- 右上角登入按鈕 -->
+    <button id="login-toggle" class="login-toggle-btn" aria-haspopup="dialog" aria-controls="login-modal"
+        aria-label="開啟登入視窗">
+        登入
+    </button>
+
+    <!-- 登入 Modal -->
+    <div id="login-modal" class="login-modal hidden" role="dialog" aria-modal="true" aria-labelledby="login-title"
+        aria-describedby="login-desc">
+        <div class="login-backdrop" data-close="1"></div>
+        <div class="login-card liquid_glass-wrapper" role="document">
+            <div class="liquid_glass-outer"></div>
+            <div class="liquid_glass-cover"></div>
+            <div class="liquid_glass-reflect"></div>
+            <div class="liquid_glass-sharp"></div>
+
+            <div class="login-content">
+                <h2 id="login-title">登入系統</h2>
+                <p id="login-desc">請輸入帳號與密碼以查看「張國語錄電子版」</p>
+
+                <label class="sr-only" for="login-username">帳號</label>
+                <input id="login-username" type="text" placeholder="帳號" class="login-input" autocomplete="username"
+                    inputmode="text" />
+
+                <label class="sr-only" for="login-password">密碼</label>
+                <input id="login-password" type="password" placeholder="密碼" class="login-input"
+                    autocomplete="current-password" />
+
+                <button id="login-submit" class="login-btn" aria-label="送出登入">登入</button>
+                <button id="login-close" class="login-close-btn" aria-label="關閉登入視窗">取消</button>
+
+                <p class="login-hint">（目前為 UI Demo，僅顯示效果，之後可接入 Firebase / Supabase / 前端解密）</p>
+            </div>
+        </div>
+    </div>
+
     <!-- 背景保留固定定位 -->
     <div class="full-bg">
         <img src="static/images/background.png" />
@@ -61,6 +97,20 @@
                     <h2>關於我們</h2>
                     <p>張師社會主義民主共和國由資優班同學共同創立，
                         實行共產主義制度，致力於打造一個沒有階級差異、人人平等的理想國度。</p>
+                </section>
+
+                <!-- ✅ 登入後才顯示：「張國語錄電子版」 -->
+                <section id="quotes-section" class="content-card quotes-section" aria-live="polite"
+                    style="display: none;">
+                    <h2>張國語錄電子版</h2>
+                    <div class="quotes-board">
+                        <!-- 日後接入：把圖片載入到下方 img#quotes-img（或改為多張列表） -->
+                        <div class="quotes-placeholder">
+                            <span>已登入 ✅　此處顯示語錄圖片（Demo 佔位）</span>
+                        </div>
+                        <img id="quotes-img" alt="張國語錄圖片"
+                            style="display:none;max-width:100%;height:auto;border-radius:12px;" />
+                    </div>
                 </section>
 
                 <div class="content-card" style="text-align: center;">
@@ -120,6 +170,7 @@
     <!-- 先載入自製捲動邏輯，再載入聊天邏輯 -->
     <script src="static/js/lg-scrollbar.js"></script>
     <script src="static/js/chat.js"></script>
+    <script src="static/js/login.js"></script>
 </body>
 
 </html>

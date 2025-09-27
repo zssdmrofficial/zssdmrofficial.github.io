@@ -98,7 +98,7 @@ body::-webkit-scrollbar {
 
 /* ===================================================================
    5. Liquid Glass 樣式 (Liquid Glass/Glassmorphism Styles)
-   --- 適用於 chat-widget, liquid_glass-wrapper 等 ---
+   --- 適用於 chat-widget, liquid_glass-wrapper 等 --- 
    =================================================================== */
 
 /* liquid_glass-wrapper 容器 */
@@ -113,7 +113,7 @@ body::-webkit-scrollbar {
 
 /* 外層模糊（可能用於 SVG 濾鏡） */
 .liquid_glass-outer {
-    backdrop-filter: url(#liquid_glass_filter);
+    backdrop-filter: blur(20px) saturate(180%);
     position: absolute;
     inset: 0;
     z-index: 0;
@@ -374,4 +374,180 @@ html.lg-dragging * {
     .lg-scrollbar-thumb {
         transition: none;
     }
+}
+
+/* ===================================================================
+   8. 登入 UI（右上角按鈕 + 置中毛玻璃 Modal）
+   =================================================================== */
+
+/* 無障礙隱藏文字 */
+.sr-only {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    border: 0 !important;
+}
+
+/* 右上角登入按鈕 */
+.login-toggle-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 10px 18px;
+    font-weight: 600;
+    border: none;
+    border-radius: 12px;
+    background: var(--accent-color);
+    color: #1a1a1a;
+    cursor: pointer;
+    z-index: 10000;
+    /* 高於聊天室浮鈕 */
+    transition: background 0.25s ease, transform 0.2s ease, box-shadow .2s ease;
+    box-shadow: 0 6px 18px rgba(176, 196, 255, .35);
+}
+
+.login-toggle-btn:hover {
+    background: #c2d1ff;
+    transform: scale(1.05);
+    box-shadow: 0 8px 24px rgba(176, 196, 255, .5);
+}
+
+/* Modal 外層 */
+.login-modal {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.55);
+    /* 半透明遮罩 */
+    z-index: 10001;
+}
+
+.login-modal.hidden {
+    display: none;
+}
+
+/* 登入卡片 */
+.login-card {
+    width: min(92vw, 380px);
+    padding: 28px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.07);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    animation: fadeInScale .25s ease-out;
+}
+
+/* 簡單淡入縮放動畫 */
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.login-content h2 {
+    color: var(--accent-color);
+    margin-bottom: 8px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.login-content p {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* 輸入框 */
+.login-input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text-primary);
+    font-size: 14px;
+    transition: border .15s ease, box-shadow .15s ease, background .15s ease;
+    outline: none;
+}
+
+.login-input::placeholder {
+    color: var(--text-secondary);
+}
+
+.login-input:focus {
+    border: 1px solid var(--accent-color);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-color) 30%, transparent);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+/* 登入按鈕 */
+.login-btn {
+    width: 100%;
+    padding: 12px;
+    font-weight: 700;
+    border: none;
+    border-radius: 12px;
+    background: var(--accent-color);
+    color: #1a1a1a;
+    cursor: pointer;
+    transition: background .2s ease, transform .05s linear, box-shadow .2s ease;
+    box-shadow: 0 6px 18px rgba(176, 196, 255, .35);
+}
+
+.login-btn:hover {
+    background: #c2d1ff;
+    box-shadow: 0 8px 22px rgba(176, 196, 255, .45);
+}
+
+.login-btn:active {
+    transform: scale(.97);
+}
+
+/* 取消按鈕 */
+.login-close-btn {
+    margin-top: 10px;
+    width: 100%;
+    padding: 10px;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border-radius: 10px;
+    transition: background .15s ease;
+}
+
+.login-close-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* 登入提示文字 */
+.login-hint {
+    margin-top: 12px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    text-align: center;
+}
+
+.liquid_glass-outer,
+.liquid_glass-cover,
+.liquid_glass-reflect,
+.liquid_glass-sharp {
+    pointer-events: none;
+    /* ✅ 禁止攔截滑鼠事件 */
 }
