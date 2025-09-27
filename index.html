@@ -70,21 +70,22 @@
         </div>
     </div>
 
-    <!-- 自製捲動軸 UI（覆蓋在右側） -->
+    <!-- 自製捲動軸 UI（覆蓋在右側 / 主頁面） -->
     <div class="lg-scrollbar" aria-hidden="true">
         <div class="lg-scrollbar-track"></div>
         <div class="lg-scrollbar-thumb" role="presentation"></div>
     </div>
 
-    <!-- 聊天室（保留原始，不納入自製捲動） -->
-    <div id="chat-toggle" class="chat-toggle-button">
+    <!-- 聊天室切換按鈕 -->
+    <div id="chat-toggle" class="chat-toggle-button" aria-label="開啟聊天室">
         <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M3 15a4 4 0 0 0 4 4h2l3 3v-3h5a4 4 0 0 0 4-4V7a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4z" />
         </svg>
     </div>
 
-    <div id="chat-widget" class="chat-widget-container">
+    <!-- 聊天室（已納入自製捲動） -->
+    <div id="chat-widget" class="chat-widget-container" role="dialog" aria-label="AI 聊天室">
         <div class="liquid_glass-wrapper chat-wrapper">
             <div class="liquid_glass-outer"></div>
             <div class="liquid_glass-cover"></div>
@@ -93,9 +94,23 @@
 
             <div class="chat-content">
                 <div class="chat-header">思想小助手</div>
-                <div id="chat-box" class="chat-box"></div>
+
+                <!-- ✅ 新增：聊天室虛擬捲動根節點 -->
+                <div id="chat-scroll-root" class="chat-scroll-root" role="region" aria-label="聊天訊息滾動區">
+                    <div id="chat-scroll-content" class="chat-scroll-content">
+                        <!-- 保留原有訊息容器（chat.js 仍操作此節點） -->
+                        <div id="chat-box" class="chat-box"></div>
+                    </div>
+
+                    <!-- ✅ 新增：聊天室專用捲動軸 -->
+                    <div class="lg-scrollbar lg-scrollbar--chat" aria-hidden="true">
+                        <div class="lg-scrollbar-track"></div>
+                        <div class="lg-scrollbar-thumb" role="presentation"></div>
+                    </div>
+                </div>
+
                 <div class="chat-input-area">
-                    <input id="user-input" type="text" placeholder="輸入訊息..." class="chat-input">
+                    <input id="user-input" type="text" placeholder="輸入訊息..." class="chat-input" aria-label="訊息輸入">
                     <button id="send-button" class="chat-send-button">送出</button>
                 </div>
             </div>

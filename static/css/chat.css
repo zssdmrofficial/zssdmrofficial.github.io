@@ -26,7 +26,6 @@
     border-radius: 50%;
     background: var(--accent-color);
     color: #1a1a1a;
-    /* 顏色改為深色 */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -35,15 +34,12 @@
     z-index: 9999;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
     transition: transform 0.3s ease, background 0.3s ease;
-    /* 更平滑的過渡 */
 }
 
 .chat-toggle-button:hover {
     transform: scale(1.1);
-    /* 放大更多 */
     background: #c2d1ff;
     box-shadow: 0 0 20px rgba(176, 196, 255, 0.8);
-    /* 新增發光效果 */
 }
 
 .chat-widget-container {
@@ -80,13 +76,30 @@
     padding: 12px 15px;
 }
 
+/* ✅ 聊天室虛擬捲動容器 */
+.chat-scroll-root {
+    position: relative;
+    flex: 1;
+    overflow: hidden;
+    /* 由 JS 虛擬捲動 */
+}
+
+.chat-scroll-content {
+    position: absolute;
+    inset: 0;
+    will-change: transform;
+    transform: translate3d(0, 0, 0);
+}
+
+/* 原本訊息容器：仍由 chat.js 寫入訊息，但不再自己捲動 */
 .chat-box {
     flex: 1;
     padding: 10px 15px;
-    overflow-y: auto;
+    /* overflow-y: auto;  <-- 移除原生捲動，交給 chat-scroll-* 虛擬捲動  */
     font-size: 14px;
     color: var(--text-primary);
     background: rgb(112, 112, 112);
+    overscroll-behavior: contain;
 }
 
 .chat-box p {
@@ -120,7 +133,6 @@
 
 .chat-input.shake {
     animation: shake 0.5s;
-    /* 錯誤時震動 */
     border: 1px solid red;
 }
 
@@ -136,7 +148,6 @@
     padding: 10px 15px;
     cursor: pointer;
     transition: background 0.2s, transform 0.1s;
-    /* 新增過渡 */
 }
 
 .chat-send-button:hover {
@@ -145,7 +156,6 @@
 
 .chat-send-button:active {
     transform: scale(0.95);
-    /* 按下縮小 */
 }
 
 .code-container {
@@ -198,16 +208,11 @@
     border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
-/* chat.css */
-
-/* ... 在你的其他 CSS 規則之後新增以下內容 ... */
-
-/* 1. 定義滑入動畫 */
+/* 進場動畫（保留） */
 @keyframes slideInFromBottom {
     0% {
         opacity: 0;
         transform: translateY(20px);
-        /* 從底部 20px 處開始 */
     }
 
     100% {
@@ -216,35 +221,104 @@
     }
 }
 
-/* 2. 將動畫套用到 AI 的訊息上 */
 .message.model {
-    /* 確保初始狀態是隱藏的，並且動畫結束後保持最終狀態 */
     opacity: 0;
     animation: slideInFromBottom 0.5s ease-out forwards;
-    /* 0.5 秒的滑入動畫 */
 }
 
-/* ========== Chat Box Scrollbar Fine-tune ========== */
-.chat-box {
-    /* 已有 overflow-y: auto; 這裡補充幾個細節 */
-    overscroll-behavior: contain;
-    /* 防止滾到頁面外層 */
-}
-
-/* Firefox 單獨指定（會沿用全站設定，但這裡可再微調） */
+/* ==========（舊）原生捲動外觀微調：保留以免回退出現突兀，但現已不使用 ========== */
 .chat-box {
     scrollbar-width: thin;
     scrollbar-color: var(--scrollbar-thumb, var(--scrollbar-thumb-fallback)) var(--scrollbar-track);
 }
 
-/* WebKit：hover 時加強亮度，讓可抓取性更好 */
 .chat-box:hover::-webkit-scrollbar-thumb {
     background-image:
         linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.20)),
-        linear-gradient(180deg, var(--scrollbar-thumb-hover, var(--scrollbar-thumb-hover-fallback)),
-            rgba(176, 196, 255, 0.42));
+        linear-gradient(180deg, var(--scrollbar-thumb-hover, var(--scrollbar-thumb-hover-fallback)), rgba(176, 196, 255, 0.42));
     box-shadow:
         inset 0 1px 0 rgba(255, 255, 255, 0.85),
         inset 0 -1px 0 rgba(0, 0, 0, 0.30),
         0 0 18px var(--scrollbar-glow);
+}
+
+/* ✅ 聊天室專用：Liquid Glass 捲動軸外觀（與主頁面一致但略窄） */
+.lg-scrollbar--chat {
+    position: absolute;
+    top: 6px;
+    bottom: 6px;
+    right: 6px;
+    width: 12px;
+    z-index: 10;
+    pointer-events: none;
+    /* 只有子元素可互動 */
+    opacity: 0;
+    transition: opacity .25s ease;
+}
+
+.lg-scrollbar--chat.lg-visible {
+    opacity: 1;
+}
+
+.lg-scrollbar--chat.lg-hidden {
+    display: none;
+}
+
+.lg-scrollbar--chat .lg-scrollbar-track {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 12px;
+    border-radius: 999px;
+    backdrop-filter: blur(14px) saturate(180%);
+    -webkit-backdrop-filter: blur(14px) saturate(180%);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.04));
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06), 0 4px 18px rgba(0, 0, 0, 0.25);
+    pointer-events: auto;
+}
+
+.lg-scrollbar--chat .lg-scrollbar-thumb {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 12px;
+    height: 48px;
+    border-radius: 999px;
+    border: 3px solid transparent;
+    background-clip: padding-box;
+    background-image:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0.15)),
+        linear-gradient(180deg, var(--accent-color, #b0c4ff), rgba(176, 196, 255, 0.22));
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.75),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.25),
+        0 0 12px rgba(176, 196, 255, 0.35);
+    transition: box-shadow .15s ease, background-image .15s ease, transform .05s linear;
+    cursor: grab;
+    pointer-events: auto;
+}
+
+.lg-scrollbar--chat .lg-scrollbar-thumb:hover {
+    background-image:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.25)),
+        linear-gradient(180deg, color-mix(in srgb, var(--accent-color) 70%, transparent), rgba(176, 196, 255, 0.35));
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.85),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.30),
+        0 0 16px rgba(176, 196, 255, 0.45);
+}
+
+.lg-scrollbar--chat .lg-scrollbar-thumb:active {
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.9),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.35),
+        0 0 18px rgba(176, 196, 255, 0.6);
+}
+
+/* 滑塊拖曳通用游標 */
+html.lg-dragging,
+html.lg-dragging * {
+    cursor: grabbing !important;
 }
