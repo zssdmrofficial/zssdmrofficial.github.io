@@ -1,3 +1,6 @@
+/* ===================================================================
+   1. CSS 變數 (Custom Properties)
+   =================================================================== */
 :root {
     --bg-dark-overlay: rgba(0, 0, 0, 0.55);
     --content-bg: rgba(255, 255, 255, 0.03);
@@ -8,7 +11,9 @@
     --maxw-content: 700px;
 }
 
-/* 新增 CSS Keyframes */
+/* ===================================================================
+   2. 關鍵幀動畫 (Keyframes)
+   =================================================================== */
 @keyframes slideInUp {
     from {
         opacity: 0;
@@ -31,6 +36,9 @@
     }
 }
 
+/* ===================================================================
+   3. 全局/基本樣式 (Global / Base Styles)
+   =================================================================== */
 * {
     box-sizing: border-box;
 }
@@ -41,7 +49,7 @@ body {
     font-family: "Noto Sans TC", "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     background-color: #000;
     animation: fadeIn 1s ease-out;
-    /* 頁面載入淡入 */
+    /* 頁面載入淡入效果 */
 }
 
 p {
@@ -49,6 +57,19 @@ p {
     line-height: 1.7;
 }
 
+/* Firefox 專用：隱藏捲軸 */
+body {
+    scrollbar-width: none;
+}
+
+/* WebKit (Chrome, Safari) 專用：隱藏捲軸 */
+body::-webkit-scrollbar {
+    display: none;
+}
+
+/* ===================================================================
+   4. 背景圖片 / 遮罩 (Full Background)
+   =================================================================== */
 .full-bg {
     position: fixed;
     top: 0;
@@ -75,7 +96,12 @@ p {
     z-index: -1;
 }
 
-/* liquid_glass 樣式 - 保持不變 */
+/* ===================================================================
+   5. Liquid Glass 樣式 (Liquid Glass/Glassmorphism Styles)
+   --- 適用於 chat-widget, liquid_glass-wrapper 等 ---
+   =================================================================== */
+
+/* liquid_glass-wrapper 容器 */
 .liquid_glass-wrapper {
     position: relative;
     display: flex;
@@ -85,6 +111,7 @@ p {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
+/* 外層模糊（可能用於 SVG 濾鏡） */
 .liquid_glass-outer {
     backdrop-filter: url(#liquid_glass_filter);
     position: absolute;
@@ -94,6 +121,7 @@ p {
     background: transparent;
 }
 
+/* 玻璃主體：模糊與半透明背景 */
 .liquid_glass-cover {
     backdrop-filter: blur(28px) saturate(180%);
     -webkit-backdrop-filter: blur(28px) saturate(180%);
@@ -105,6 +133,7 @@ p {
     border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
+/* 邊緣銳利/高光效果 */
 .liquid_glass-sharp {
     position: absolute;
     inset: 0;
@@ -115,6 +144,7 @@ p {
     pointer-events: none;
 }
 
+/* 頂部反射光感 */
 .liquid_glass-reflect {
     position: absolute;
     inset: 1px;
@@ -133,6 +163,10 @@ p {
     align-items: center;
     justify-content: center;
 }
+
+/* ===================================================================
+   6. 內容與卡片樣式 (Content & Card Styles)
+   =================================================================== */
 
 .main-container {
     width: 100%;
@@ -183,6 +217,7 @@ section:nth-child(4) {
     /* Hover 發光效果 */
 }
 
+/* 標題樣式 */
 header h1 {
     font-size: clamp(32px, 4vw, 48px);
     font-weight: 800;
@@ -210,36 +245,133 @@ section p {
     color: var(--text-secondary);
 }
 
-.bottom-dock {
+/* ===================================================================
+   7. 自製虛擬捲動 (Custom Virtual Scrollbar)
+   =================================================================== */
+
+/* 關閉全頁原生滾動 */
+body.no-native-scroll {
+    overflow: hidden;
+}
+
+/* 視窗容器：佔滿視口；由 JS 虛擬捲動內容 */
+.lg-scroll-root {
     position: fixed;
-    bottom: 0;
+    inset: 0;
+    overflow: hidden;
+    /* 真正隱藏原生捲動 */
+    z-index: 1;
+    /* 低於聊天室浮層 */
+}
+
+/* 內容容器：由 JS 以 transform 位移 */
+.lg-scroll-content {
+    position: absolute;
+    inset: 0 auto auto 0;
     width: 100%;
-    padding: 16px;
-    display: flex;
-    justify-content: center;
-    z-index: 10;
+    will-change: transform;
+    transform: translate3d(0, 0, 0);
 }
 
-.dock-inner {
-    display: flex;
-    gap: 16px;
-    padding: 8px;
-    max-width: fit-content;
-    border-radius: 40px;
-    --border-radius: 40px;
+/* 捲動軌道容器 */
+.lg-scrollbar {
+    position: fixed;
+    top: 0;
+    right: 12px;
+    bottom: 0;
+    width: 14px;
+    z-index: 30;
+    pointer-events: none;
+    /* 預設不攔滑鼠，只有子元素可互動 */
+    opacity: 0;
+    transition: opacity .25s ease;
 }
 
-.dock-item {
-    width: 48px;
+.lg-scrollbar.lg-visible {
+    opacity: 1;
+}
+
+.lg-scrollbar.lg-hidden {
+    display: none;
+}
+
+/* 捲動軌道（玻璃感） */
+.lg-scrollbar-track {
+    position: absolute;
+    left: 0;
+    top: 16px;
+    bottom: 16px;
+    width: 14px;
+    border-radius: 999px;
+    backdrop-filter: blur(14px) saturate(180%);
+    -webkit-backdrop-filter: blur(14px) saturate(180%);
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.04));
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.06),
+        0 4px 18px rgba(0, 0, 0, 0.25);
+    pointer-events: auto;
+}
+
+/* 玻璃感滑塊 */
+.lg-scrollbar-thumb {
+    position: absolute;
+    left: 0;
+    top: 16px;
+    /* 起始位移由 JS 控制 transform */
+    width: 14px;
     height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-primary);
-    transition: transform 0.2s ease;
-    cursor: pointer;
+    /* 實際高度由 JS 設定 */
+    border-radius: 999px;
+    border: 3px solid transparent;
+    background-clip: padding-box;
+    background-image:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0.15)),
+        linear-gradient(180deg, var(--accent-color, #b0c4ff), rgba(176, 196, 255, 0.22));
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.75),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.25),
+        0 0 12px rgba(176, 196, 255, 0.35);
+    transition: box-shadow .15s ease, background-image .15s ease, transform .05s linear;
+    cursor: grab;
+    pointer-events: auto;
 }
 
-.dock-item:hover {
-    transform: scale(1.05);
+/* 滑塊拖曳狀態 */
+html.lg-dragging,
+html.lg-dragging * {
+    cursor: grabbing !important;
+}
+
+.lg-scrollbar-thumb:hover {
+    background-image:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.25)),
+        linear-gradient(180deg, color-mix(in srgb, var(--accent-color) 70%, transparent), rgba(176, 196, 255, 0.35));
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.85),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+        0 0 16px rgba(176, 196, 255, 0.45);
+}
+
+.lg-scrollbar-thumb:active {
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.9),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.35),
+        0 0 18px rgba(176, 196, 255, 0.6);
+}
+
+/* 聊天室避免滾動外溢 */
+#chat-widget,
+#chat-widget * {
+    overscroll-behavior: contain;
+}
+
+/* 減少動效偏好設定 */
+@media (prefers-reduced-motion: reduce) {
+
+    .lg-scrollbar,
+    .lg-scrollbar-thumb {
+        transition: none;
+    }
 }

@@ -223,3 +223,28 @@
     animation: slideInFromBottom 0.5s ease-out forwards;
     /* 0.5 秒的滑入動畫 */
 }
+
+/* ========== Chat Box Scrollbar Fine-tune ========== */
+.chat-box {
+    /* 已有 overflow-y: auto; 這裡補充幾個細節 */
+    overscroll-behavior: contain;
+    /* 防止滾到頁面外層 */
+}
+
+/* Firefox 單獨指定（會沿用全站設定，但這裡可再微調） */
+.chat-box {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb, var(--scrollbar-thumb-fallback)) var(--scrollbar-track);
+}
+
+/* WebKit：hover 時加強亮度，讓可抓取性更好 */
+.chat-box:hover::-webkit-scrollbar-thumb {
+    background-image:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.20)),
+        linear-gradient(180deg, var(--scrollbar-thumb-hover, var(--scrollbar-thumb-hover-fallback)),
+            rgba(176, 196, 255, 0.42));
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.85),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.30),
+        0 0 18px var(--scrollbar-glow);
+}
