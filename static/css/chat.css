@@ -197,3 +197,29 @@
     background: rgba(255, 255, 255, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.12);
 }
+
+/* chat.css */
+
+/* ... 在你的其他 CSS 規則之後新增以下內容 ... */
+
+/* 1. 定義滑入動畫 */
+@keyframes slideInFromBottom {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+        /* 從底部 20px 處開始 */
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 2. 將動畫套用到 AI 的訊息上 */
+.message.model {
+    /* 確保初始狀態是隱藏的，並且動畫結束後保持最終狀態 */
+    opacity: 0;
+    animation: slideInFromBottom 0.5s ease-out forwards;
+    /* 0.5 秒的滑入動畫 */
+}

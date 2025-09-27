@@ -1,5 +1,5 @@
 const API_KEY = "AIzaSyDo6isc-iR_Sv0XIznh4Tx7b8sn9pfKa6I";
-const MODEL = "gemini-2.0-flash-lite";
+const MODEL = "gemma-3-27b-it";
 const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${API_KEY}`;
 
 const SYSTEM_INSTRUCTION = `
@@ -169,6 +169,13 @@ async function sendMessage() {
     inputEl.disabled = true;
     sendButtonEl.disabled = true;
 
+    // === 新增：顯示「回應中...」 ===
+    const loadingEl = document.createElement("p");
+    loadingEl.id = "loading-message";
+    loadingEl.innerHTML = `<b>小助手:</b> <i>思想小助手回應中...</i>`;
+    chatBoxEl.appendChild(loadingEl);
+    chatBoxEl.scrollTo({ top: chatBoxEl.scrollHeight, behavior: 'smooth' });
+
     try {
         const res = await fetch(API_URL, {
             method: "POST",
@@ -182,6 +189,9 @@ async function sendMessage() {
         }
 
         const data = await res.json();
+        // 移除「回應中」提示
+        document.getElementById("loading-message")?.remove();
+
         if (data.candidates?.length) {
             const c = data.candidates[0];
             const parts = c.content?.parts || [];
@@ -200,6 +210,8 @@ async function sendMessage() {
         }
     } catch (e) {
         console.error(e);
+        // 移除「回應中」提示
+        document.getElementById("loading-message")?.remove();
         renderMessage("model", `請求失敗: ${e.message}`, true);
     } finally {
         inputEl.disabled = false;
@@ -207,6 +219,8 @@ async function sendMessage() {
         inputEl.focus();
     }
 }
+
+
 
 chatToggleEl?.addEventListener("click", () => {
     const isHidden = chatWidgetEl.style.display === "none" || chatWidgetEl.style.display === "";
