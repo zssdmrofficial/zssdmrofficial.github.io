@@ -8,12 +8,10 @@ window.addEventListener("hashchange", () => {
         quotesRoot.style.display = "none";
         flagRoot.style.display = "block";
     } else {
-        // 回到首頁或其他狀態時，隱藏 flag
         flagRoot.style.display = "none";
     }
 });
 
-// 初始載入時檢查 hash
 window.addEventListener("DOMContentLoaded", () => {
     if (location.hash === "#flag") {
         document.getElementById("lg-scroll-root").style.display = "none";
