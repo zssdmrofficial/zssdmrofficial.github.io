@@ -338,3 +338,16 @@ inputEl?.addEventListener("keydown", (e) => {
         sendMessage();
     }
 });
+document.addEventListener('DOMContentLoaded', () => {
+    const hint = document.getElementById('chat-hint');
+
+    // 延遲 0.5 秒顯示
+    setTimeout(() => {
+        hint.classList.add('show');
+    }, 500);
+
+    // 4 秒後自動隱藏
+    setTimeout(() => {
+        hint.classList.remove('show');
+    }, 4500);
+});
