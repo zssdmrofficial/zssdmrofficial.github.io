@@ -29,6 +29,18 @@
     }
 }
 
+@keyframes slideInFromBottom {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 .chat-toggle-button {
     position: fixed;
     bottom: 20px;
@@ -160,6 +172,16 @@
     color: #b0c4ff;
 }
 
+.chat-box:hover::-webkit-scrollbar-thumb {
+    background-image:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.20)),
+        linear-gradient(180deg, var(--scrollbar-thumb-hover, var(--scrollbar-thumb-hover-fallback)), rgba(176, 196, 255, 0.42));
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.85),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.30),
+        0 0 18px var(--scrollbar-glow);
+}
+
 .chat-input-area {
     display: flex;
     border-top: 1px solid rgba(255, 255, 255, 0.2);
@@ -258,31 +280,9 @@
     border: 1px solid rgba(255, 255, 255, 0.16);
 }
 
-@keyframes slideInFromBottom {
-    0% {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-
-    100% {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
 .message.model {
     opacity: 0;
     animation: slideInFromBottom 0.5s ease-out forwards;
-}
-
-.chat-box:hover::-webkit-scrollbar-thumb {
-    background-image:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.20)),
-        linear-gradient(180deg, var(--scrollbar-thumb-hover, var(--scrollbar-thumb-hover-fallback)), rgba(176, 196, 255, 0.42));
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.85),
-        inset 0 -1px 0 rgba(0, 0, 0, 0.30),
-        0 0 18px var(--scrollbar-glow);
 }
 
 .lg-scrollbar--chat {
@@ -366,7 +366,6 @@ html.lg-dragging * {
 .chat-hint {
     position: fixed;
     bottom: 90px;
-    /* 在按鈕上方 */
     right: 20px;
     padding: 8px 14px;
     font-size: 14px;
@@ -377,8 +376,6 @@ html.lg-dragging * {
     opacity: 0;
     transform: translateY(10px);
     transition: opacity .5s ease, transform .5s ease;
-
-    /* 毛玻璃效果 */
     background: var(--chat-glass-bg-strong);
     backdrop-filter: blur(var(--chat-blur)) saturate(160%);
     -webkit-backdrop-filter: blur(var(--chat-blur)) saturate(160%);
@@ -386,12 +383,9 @@ html.lg-dragging * {
     box-shadow:
         inset 0 1px 0 rgba(255, 255, 255, 0.25),
         0 6px 18px rgba(0, 0, 0, 0.25);
-
     pointer-events: none;
-    /* 不擋住按鈕 */
 }
 
-/* 小尾巴箭頭 */
 .chat-hint::after {
     content: "";
     position: absolute;

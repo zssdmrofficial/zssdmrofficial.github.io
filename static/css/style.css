@@ -1,6 +1,3 @@
-/* ===================================================================
-   1. CSS 變數 (Custom Properties)
-   =================================================================== */
 :root {
     --bg-dark-overlay: rgba(0, 0, 0, 0.55);
     --content-bg: rgba(255, 255, 255, 0.03);
@@ -11,9 +8,6 @@
     --maxw-content: 700px;
 }
 
-/* ===================================================================
-   2. 關鍵幀動畫 (Keyframes)
-   =================================================================== */
 @keyframes slideInUp {
     from {
         opacity: 0;
@@ -48,9 +42,6 @@
     }
 }
 
-/* ===================================================================
-   3. 全局/基本樣式 (Global / Base Styles)
-   =================================================================== */
 * {
     box-sizing: border-box;
 }
@@ -77,7 +68,6 @@ p {
     line-height: 1.7;
 }
 
-/* 無障礙隱藏文字 */
 .sr-only {
     position: absolute !important;
     width: 1px !important;
@@ -89,7 +79,6 @@ p {
     border: 0 !important;
 }
 
-/* 減少動效偏好設定 */
 @media (prefers-reduced-motion: reduce) {
 
     .lg-scrollbar,
@@ -98,9 +87,6 @@ p {
     }
 }
 
-/* ===================================================================
-   4. 背景圖片 / 遮罩 (Full Background)
-   =================================================================== */
 .full-bg {
     position: fixed;
     top: 0;
@@ -126,10 +112,6 @@ p {
     background: var(--bg-dark-overlay);
     z-index: -1;
 }
-
-/* ===================================================================
-   5. Liquid Glass 樣式 (Liquid Glass/Glassmorphism Styles)
-   =================================================================== */
 
 .liquid_glass-wrapper {
     position: relative;
@@ -191,10 +173,6 @@ p {
     justify-content: center;
 }
 
-/* ===================================================================
-   6. 內容與卡片樣式 (Content & Card Styles)
-   =================================================================== */
-
 .main-container {
     width: 100%;
     max-width: var(--maxw-content);
@@ -213,7 +191,6 @@ p {
     animation: slideInUp 0.6s ease-out backwards;
 }
 
-/* 內容卡片動畫延遲 */
 header.content-card {
     animation-delay: 0.1s;
 }
@@ -239,7 +216,6 @@ section:nth-child(4) {
     box-shadow: 0 8px 25px rgba(176, 196, 255, 0.25);
 }
 
-/* 標題樣式 */
 header h1 {
     font-size: clamp(32px, 4vw, 48px);
     font-weight: 800;
@@ -266,10 +242,6 @@ section h2 {
 section p {
     color: var(--text-secondary);
 }
-
-/* ===================================================================
-   7. 自製虛擬捲動 (Custom Virtual Scrollbar)
-   =================================================================== */
 
 .lg-scroll-root {
     position: fixed;
@@ -367,15 +339,10 @@ html.lg-dragging * {
         0 0 18px rgba(176, 196, 255, 0.6);
 }
 
-/* 聊天室避免滾動外溢 */
 #chat-widget,
 #chat-widget * {
     overscroll-behavior: contain;
 }
-
-/* ===================================================================
-   8. 登入 UI 樣式 (Login UI Styles)
-   =================================================================== */
 
 .login-toggle-btn {
     position: fixed;
@@ -500,10 +467,6 @@ html.lg-dragging * {
     color: var(--text-secondary);
     text-align: center;
 }
-
-/* ===================================================================
-   9. 張國語錄/電子書樣式 (Quotes/Ebook Styles)
-   =================================================================== */
 
 .quotes-container {
     width: 100%;
