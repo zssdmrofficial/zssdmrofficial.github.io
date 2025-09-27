@@ -33,40 +33,6 @@
 </head>
 
 <body class="no-native-scroll">
-    <button id="login-toggle" class="login-toggle-btn" aria-haspopup="dialog" aria-controls="login-modal"
-        aria-label="開啟登入視窗">
-        登入
-    </button>
-
-    <div id="login-modal" class="login-modal hidden" role="dialog" aria-modal="true" aria-labelledby="login-title"
-        aria-describedby="login-desc">
-        <div class="login-backdrop" data-close="1"></div>
-
-        <div class="login-card liquid_glass-wrapper" role="document">
-
-            <div class="liquid_glass-cover"></div>
-            <div class="liquid_glass-sharp"></div>
-
-            <div class="login-content">
-                <h2 id="login-title">登入系統</h2>
-                <p id="login-desc">請輸入帳號與密碼以查看「張國語錄電子版」</p>
-
-                <label class="sr-only" for="login-username">帳號</label>
-                <input id="login-username" type="text" placeholder="帳號" class="login-input" autocomplete="username"
-                    inputmode="text" />
-
-                <label class="sr-only" for="login-password">密碼</label>
-                <input id="login-password" type="password" placeholder="密碼" class="login-input"
-                    autocomplete="current-password" />
-
-                <button id="login-submit" class="login-btn" aria-label="送出登入">登入</button>
-                <button id="login-close" class="login-close-btn" aria-label="關閉登入視窗">取消</button>
-
-                <p class="login-hint">（目前為 UI Demo，僅顯示效果，之後可接入 Firebase / Supabase / 前端解密）</p>
-            </div>
-        </div>
-    </div>
-
     <!-- 背景保留固定定位 -->
     <div class="full-bg">
         <img src="static/images/background.png" />
@@ -97,28 +63,20 @@
                         實行共產主義制度，致力於打造一個沒有階級差異、人人平等的理想國度。</p>
                 </section>
 
-                <!-- ✅ 登入後才顯示：「張國語錄電子版」 -->
-                <section id="quotes-section" class="content-card quotes-section" aria-live="polite"
-                    style="display: none;">
+                <!-- ✅ 直接顯示：「張國語錄電子版」 -->
+                <section id="quotes-section" class="content-card quotes-section" aria-live="polite">
                     <h2>張國語錄電子版</h2>
                     <div class="quotes-board">
-                        <!-- 日後接入：把圖片載入到下方 img#quotes-img（或改為多張列表） -->
-                        <div class="quotes-placeholder">
-                        </div>
                         <div class="quotes-container">
-                            <img id="quotes-img" alt="張國語錄圖片"
-                                style="display:none;max-width:100%;height:auto;border-radius:12px;" />
+                            <img id="quotes-img" alt="張國語錄圖片" style="max-width:100%;height:auto;border-radius:12px;" />
                         </div>
                         <div style="text-align:center; margin-top:10px;">
                             <div class="quotes-controls">
-                                <button class="page-btn" onclick="showNextImage()">下一頁 ➡</button>
-                                <span id="page-indicator">第 1 頁 / 共 N 頁</span>
                                 <button class="page-btn" onclick="showPrevImage()">⬅ 上一頁</button>
-
-
+                                <span id="page-indicator">封面</span>
+                                <button class="page-btn" onclick="showNextImage()">下一頁 ➡</button>
                             </div>
                         </div>
-
                     </div>
                 </section>
 
@@ -154,14 +112,10 @@
             <div class="chat-content">
                 <div class="chat-header">思想小助手</div>
 
-                <!-- ✅ 新增：聊天室虛擬捲動根節點 -->
                 <div id="chat-scroll-root" class="chat-scroll-root" role="region" aria-label="聊天訊息滾動區">
                     <div id="chat-scroll-content" class="chat-scroll-content">
-                        <!-- 保留原有訊息容器（chat.js 仍操作此節點） -->
                         <div id="chat-box" class="chat-box"></div>
                     </div>
-
-                    <!-- ✅ 新增：聊天室專用捲動軸 -->
                     <div class="lg-scrollbar lg-scrollbar--chat" aria-hidden="true">
                         <div class="lg-scrollbar-track"></div>
                         <div class="lg-scrollbar-thumb" role="presentation"></div>
@@ -176,10 +130,10 @@
         </div>
     </div>
 
-    <!-- 先載入自製捲動邏輯，再載入聊天邏輯 -->
+    <!-- 先載入自製捲動邏輯，再載入聊天邏輯，再載入電子書 -->
     <script src="static/js/lg-scrollbar.js"></script>
     <script src="static/js/chat.js"></script>
-    <script src="static/js/login.js"></script>
+    <script src="static/js/ebook.js"></script>
 </body>
 
 </html>
