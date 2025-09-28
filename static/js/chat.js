@@ -102,28 +102,50 @@ const SYSTEM_INSTRUCTION = `
 ================================================
 `;
 
+const CHAT_STATE_KEY = 'chat_state_v1';
 
-let history = [
-    {
-        role: "user",
-        parts: [{ text: SYSTEM_INSTRUCTION + "請根據這個設定，對使用者說一個友善的開場白。" }],
-    },
-    {
-        role: "model",
-        parts: [
-            {
-                text:
-                    "同志您好！我是思想小助手，很高興能為您服務。本共和國以厚道為核心，請問您有什麼疑問或需要協助的地方嗎？",
-            },
-        ],
-    },
-];
+function isHardReload() {
+    const nav = performance.getEntriesByType && performance.getEntriesByType('navigation');
+    if (nav && nav.length) return nav[0].type === 'reload';
+    if (performance.navigation) return performance.navigation.type === 1;
+    return false;
+}
+
+let __restored = false;
+try {
+    const raw = sessionStorage.getItem(CHAT_STATE_KEY);
+    if (raw && !isHardReload()) {
+        const saved = JSON.parse(raw);
+        if (Array.isArray(saved.history) && saved.history.length) {
+            window.__CHAT_HISTORY__ = saved.history;
+            window.__CHAT_OPEN__ = !!saved.open;
+            __restored = true;
+        }
+    } else if (isHardReload()) {
+        sessionStorage.removeItem(CHAT_STATE_KEY);
+    }
+} catch (e) {
+    console.warn('恢復聊天狀態失敗：', e);
+}
+
+if (!__restored) {
+    window.__CHAT_HISTORY__ = window.__CHAT_HISTORY__ || [
+        { role: "user", parts: [{ text: SYSTEM_INSTRUCTION + "請根據這個設定，對使用者說一個友善的開場白。" }] },
+        { role: "model", parts: [{ text: "同志您好！我是思想小助手，很高興能為您服務。本共和國以厚道為核心，請問您有什麼疑問或需要協助的地方嗎？" }] },
+    ];
+}
+let history = window.__CHAT_HISTORY__;
+
 
 const chatToggleEl = document.getElementById("chat-toggle");
 const chatWidgetEl = document.getElementById("chat-widget");
 const inputEl = document.getElementById("user-input");
 const chatBoxEl = document.getElementById("chat-box");
 const sendButtonEl = document.getElementById("send-button");
+
+if (chatWidgetEl && typeof window.__CHAT_OPEN__ === 'boolean') {
+    chatWidgetEl.style.display = window.__CHAT_OPEN__ ? "block" : "none";
+}
 
 function escapeHtml(text) {
     if (typeof text !== "string") return "";
@@ -258,13 +280,11 @@ async function callApiWithRetry(body, maxRetries = Infinity) {
                 body: JSON.stringify(body),
             });
 
-            // 503 → 立即重試
             if (res.status === 503) {
                 console.warn(`[API] 503 超載，第 ${attempt} 次 → 立即重試`);
                 continue;
             }
 
-            // 429 → 等待冷卻時間
             if (res.status === 429) {
                 let retryAfter = parseInt(res.headers.get("Retry-After") || "0", 10);
 
@@ -274,30 +294,27 @@ async function callApiWithRetry(body, maxRetries = Infinity) {
                     const match = msg.match(/retry in ([\d.]+)s/i);
                     if (match) retryAfter = Math.ceil(parseFloat(match[1]));
                 }
-                if (!retryAfter) retryAfter = 5; // fallback 預設 5 秒
+                if (!retryAfter) retryAfter = 5;
 
                 console.warn(`[API] 429 配額超限 → 等待 ${retryAfter} 秒再重試 (第 ${attempt} 次)`);
 
-                // 顯示倒數
                 await showCooldownCountdown(retryAfter);
 
                 continue;
             }
 
-            // 其他錯誤
             if (!res.ok) {
                 const err = await res.json().catch(() => ({}));
                 console.error(`[API] 非 503/429 錯誤: ${res.status}`, err);
                 throw new Error(`API 失敗: ${res.status} ${res.statusText} - ${err?.error?.message || "未知錯誤"}`);
             }
 
-            // 成功
             console.log(`[API] 成功! 第 ${attempt} 次呼叫返回結果`);
             return await res.json();
 
         } catch (e) {
             console.error(`[API] 呼叫失敗 (第 ${attempt} 次):`, e);
-            throw e; // 非 503 / 429 → 直接丟錯
+            throw e;
         }
     }
     throw new Error("已達最大重試次數仍失敗");
@@ -340,6 +357,8 @@ async function sendMessage() {
 
     renderMessage("user", text);
     history.push({ role: "user", parts: [{ text }] });
+    persistChatState();
+
 
     inputEl.value = "";
     inputEl.disabled = true;
@@ -363,6 +382,8 @@ async function sendMessage() {
 
             if (reply) {
                 history.push({ role: "model", parts: [{ text: reply }] });
+                persistChatState();
+
                 renderMessage("model", reply);
             } else {
                 renderMessage("model", `回傳沒有文字或被過濾 (finishReason: ${c.finishReason || "未知"})`, true);
@@ -384,7 +405,6 @@ async function sendMessage() {
 }
 
 
-
 chatToggleEl?.addEventListener("click", () => {
     const isHidden = chatWidgetEl.style.display === "none" || chatWidgetEl.style.display === "";
 
@@ -393,6 +413,9 @@ chatToggleEl?.addEventListener("click", () => {
         chatWidgetEl.style.transform = 'translateY(10px) scale(0.95)';
         chatWidgetEl.style.transition = 'opacity 0.3s ease-out, transform 0.3s ease-out';
         chatWidgetEl.style.display = "block";
+        window.__CHAT_OPEN__ = true;
+        persistChatState();
+
         setTimeout(() => {
             chatWidgetEl.style.opacity = '1';
             chatWidgetEl.style.transform = 'translateY(0) scale(1)';
@@ -408,9 +431,12 @@ chatToggleEl?.addEventListener("click", () => {
             chatWidgetEl.style.opacity = '';
             chatWidgetEl.style.transform = '';
             chatWidgetEl.style.transition = '';
+            window.__CHAT_OPEN__ = false;
+            persistChatState();
         }, 300);
     }
 });
+
 
 sendButtonEl?.addEventListener("click", sendMessage);
 
@@ -420,14 +446,55 @@ inputEl?.addEventListener("keydown", (e) => {
         sendMessage();
     }
 });
+
 document.addEventListener('DOMContentLoaded', () => {
     const hint = document.getElementById('chat-hint');
+    if (!hint) return;
 
-    setTimeout(() => {
-        hint.classList.add('show');
-    }, 500);
+    if (!isHardReload()) return;
 
-    setTimeout(() => {
-        hint.classList.remove('show');
-    }, 4500);
+    setTimeout(() => hint.classList.add('show'), 500);
+    setTimeout(() => hint.classList.remove('show'), 4500);
+});
+
+
+function persistChatState() {
+    try {
+        const payload = {
+            history: window.__CHAT_HISTORY__ || [],
+            open: !!window.__CHAT_OPEN__
+        };
+        sessionStorage.setItem(CHAT_STATE_KEY, JSON.stringify(payload));
+    } catch (e) {
+        console.warn('儲存聊天狀態失敗：', e);
+    }
+}
+
+
+window.addEventListener('pagehide', persistChatState);
+window.addEventListener('beforeunload', persistChatState);
+
+function renderAllFromHistoryOnce() {
+    if (!chatBoxEl) return;
+    if (!Array.isArray(history) || !history.length) return;
+    if (chatBoxEl.__hydrated__) return;
+    chatBoxEl.__hydrated__ = true;
+
+    chatBoxEl.innerHTML = '';
+    for (const msg of history) {
+        const text = (msg?.parts?.[0]?.text) || '';
+        if (!text) continue;
+        if (text.includes(SYSTEM_INSTRUCTION)) {
+            continue;
+        }
+        renderMessage(msg.role === 'user' ? 'user' : 'model', text);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    renderAllFromHistoryOnce();
+
+    if (chatWidgetEl && window.__CHAT_OPEN__) {
+        inputEl?.focus?.();
+    }
 });
