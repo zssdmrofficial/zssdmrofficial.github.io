@@ -245,6 +245,91 @@ function renderMessage(role, content, isError = false) {
     chatBoxEl.scrollTo({ top: chatBoxEl.scrollHeight, behavior: 'smooth' });
 }
 
+async function callApiWithRetry(body, maxRetries = Infinity) {
+    let attempt = 0;
+    while (attempt < maxRetries) {
+        attempt++;
+        console.log(`[API] 嘗試第 ${attempt} 次呼叫...`);
+
+        try {
+            const res = await fetch(API_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(body),
+            });
+
+            // 503 → 立即重試
+            if (res.status === 503) {
+                console.warn(`[API] 503 超載，第 ${attempt} 次 → 立即重試`);
+                continue;
+            }
+
+            // 429 → 等待冷卻時間
+            if (res.status === 429) {
+                let retryAfter = parseInt(res.headers.get("Retry-After") || "0", 10);
+
+                if (!retryAfter) {
+                    const errData = await res.json().catch(() => ({}));
+                    const msg = errData?.error?.message || "";
+                    const match = msg.match(/retry in ([\d.]+)s/i);
+                    if (match) retryAfter = Math.ceil(parseFloat(match[1]));
+                }
+                if (!retryAfter) retryAfter = 5; // fallback 預設 5 秒
+
+                console.warn(`[API] 429 配額超限 → 等待 ${retryAfter} 秒再重試 (第 ${attempt} 次)`);
+
+                // 顯示倒數
+                await showCooldownCountdown(retryAfter);
+
+                continue;
+            }
+
+            // 其他錯誤
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                console.error(`[API] 非 503/429 錯誤: ${res.status}`, err);
+                throw new Error(`API 失敗: ${res.status} ${res.statusText} - ${err?.error?.message || "未知錯誤"}`);
+            }
+
+            // 成功
+            console.log(`[API] 成功! 第 ${attempt} 次呼叫返回結果`);
+            return await res.json();
+
+        } catch (e) {
+            console.error(`[API] 呼叫失敗 (第 ${attempt} 次):`, e);
+            throw e; // 非 503 / 429 → 直接丟錯
+        }
+    }
+    throw new Error("已達最大重試次數仍失敗");
+}
+
+async function showCooldownCountdown(seconds) {
+    return new Promise((resolve) => {
+        let remaining = seconds;
+        const loadingEl = document.getElementById("loading-message");
+
+        console.log(`[COOLDOWN] 進入冷卻，總共 ${seconds} 秒`);
+
+        const timer = setInterval(() => {
+            if (loadingEl) {
+                loadingEl.innerHTML = `<b>小助手:</b> <i>思想小助手回應中...(等待 ${remaining} 秒冷卻)</i>`;
+            }
+            console.log(`[COOLDOWN] 剩餘 ${remaining} 秒`);
+            remaining--;
+
+            if (remaining <= 0) {
+                clearInterval(timer);
+                if (loadingEl) {
+                    loadingEl.innerHTML = `<b>小助手:</b> <i>思想小助手回應中...</i>`;
+                }
+                console.log(`[COOLDOWN] 冷卻結束，準備重試 API`);
+                resolve();
+            }
+        }, 1000);
+    });
+}
+
+
 async function sendMessage() {
     const text = inputEl.value.trim();
     if (!text) {
@@ -267,18 +352,8 @@ async function sendMessage() {
     chatBoxEl.scrollTo({ top: chatBoxEl.scrollHeight, behavior: 'smooth' });
 
     try {
-        const res = await fetch(API_URL, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ contents: history }),
-        });
+        const data = await callApiWithRetry({ contents: history });
 
-        if (!res.ok) {
-            const err = await res.json().catch(() => ({}));
-            throw new Error(`API 失敗: ${res.status} ${res.statusText} - ${err?.error?.message || "未知錯誤"}`);
-        }
-
-        const data = await res.json();
         document.getElementById("loading-message")?.remove();
 
         if (data.candidates?.length) {
@@ -307,6 +382,7 @@ async function sendMessage() {
         inputEl.focus();
     }
 }
+
 
 
 chatToggleEl?.addEventListener("click", () => {
