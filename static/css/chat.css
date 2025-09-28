@@ -249,7 +249,7 @@
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
     font-size: 14px;
     display: block;
-    color: #f0f3f6;
+    color: rgba(88, 86, 86, 1) !important;
 }
 
 .copy-button {
