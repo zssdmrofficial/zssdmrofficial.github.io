@@ -1,6 +1,6 @@
 :root {
     /* === 粉紅主題色票（統一色系） === */
-    --accent-color: #ff6db6;
+    --accent-color: #ff0000;
     /* 主粉紅：鮮明 */
     --accent-strong: color-mix(in srgb, var(--accent-color) 85%, white 15%);
     --accent-soft: color-mix(in srgb, var(--accent-color) 40%, white 10%);
