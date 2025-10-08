@@ -5,11 +5,11 @@
     --chat-glass-bg-strong: rgba(255, 255, 255, 0.7);
     --chat-border: rgba(255, 255, 255, 0.14);
     --chat-border-strong: rgba(255, 255, 255, 0.18);
-    --scrollbar-thumb-fallback: #ff4b4b;
+    --scrollbar-thumb-fallback: #ff8383;
     --scrollbar-thumb-hover-fallback: #ff9e9e;
     --scrollbar-track: rgba(255, 255, 255, 0.06);
     --scrollbar-glow: rgba(253, 105, 105, 0.45);
-    --accent-color: var(--accent-color, #ff0000);
+    --accent-color: var(--accent-color, #ff8888);
 }
 
 
@@ -50,7 +50,7 @@
     width: 60px;
     height: 60px;
     border-radius: 50%;
-    background: var(--accent-color, #ff3737);
+    background: var(--accent-color, #ff8888);
     color: #1a1a1a;
     display: flex;
     align-items: center;
@@ -65,8 +65,8 @@
 .chat-toggle-button:hover {
     transform: scale(1.1);
     /* 由藍改粉：更亮的主色 */
-    background: color-mix(in srgb, var(--accent-color, #ff3737) 88%, white 12%);
-    box-shadow: 0 0 20px color-mix(in srgb, var(--accent-color, #ff3737) 60%, transparent);
+    background: color-mix(in srgb, var(--accent-color, #ff8888) 88%, white 12%);
+    box-shadow: 0 0 20px color-mix(in srgb, var(--accent-color, #ff8888) 60%, transparent);
 }
 
 .chat-widget-container {
@@ -117,7 +117,7 @@
 }
 
 .chat-header {
-    background: var(--accent-color, #ff3737);
+    background: var(--accent-color, #ff8888);
     color: rgba(26, 24, 24, 1);
     font-weight: 700;
     padding: 12px 15px;
@@ -153,7 +153,7 @@
     background-image:
         linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.20)),
         /* 第二層由藍改粉 */
-        linear-gradient(180deg, var(--scrollbar-thumb-hover, var(--scrollbar-thumb-hover-fallback)), color-mix(in srgb, var(--accent-color, #ff3737) 35%, transparent));
+        linear-gradient(180deg, var(--scrollbar-thumb-hover, var(--scrollbar-thumb-hover-fallback)), color-mix(in srgb, var(--accent-color, #ff8888) 35%, transparent));
     box-shadow:
         inset 0 1px 0 rgba(255, 255, 255, 0.85),
         inset 0 -1px 0 rgba(0, 0, 0, 0.30),
@@ -184,7 +184,7 @@
 }
 
 .chat-box b {
-    color: var(--accent-color, #ff3737);
+    color: var(--accent-color, #ff8888);
     /* 由淡粉改成主色強調 */
 }
 
@@ -217,7 +217,7 @@
 }
 
 .chat-send-button {
-    background: var(--accent-color, #ff3737);
+    background: var(--accent-color, #ff8888);
     color: #1a1a1a;
     font-weight: 700;
     border: none;
@@ -228,7 +228,7 @@
 
 .chat-send-button:hover {
     /* 由藍改粉 */
-    background: color-mix(in srgb, var(--accent-color, #ff3737) 90%, white 10%);
+    background: color-mix(in srgb, var(--accent-color, #ff8888) 90%, white 10%);
 }
 
 .chat-send-button:active {
@@ -264,7 +264,7 @@
     top: 6px;
     right: 6px;
     padding: 3px 8px;
-    background-color: var(--accent-color, #ff3737);
+    background-color: var(--accent-color, #ff8888);
     color: #1a1a1a;
     border: none;
     border-radius: 6px;
@@ -277,7 +277,11 @@
 .copy-button:hover {
     opacity: 1;
     /* 由藍改粉 */
-    background-color: color-mix(in srgb, var(--accent-color, #ff3737) 88%, white 12%);
+    background-color: color-mix(in srgb, var(--accent-color, #ff8888) 88%, white 12%);
+}
+
+.copy-button:active {
+    transform: scale(0.95);
 }
 
 .inline-code {
@@ -343,7 +347,7 @@
     background-image:
         linear-gradient(180deg, rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0.15)),
         /* 第二層由藍改粉 */
-        linear-gradient(180deg, var(--accent-color, #ff3737), color-mix(in srgb, var(--accent-color, #ff3737) 22%, transparent));
+        linear-gradient(180deg, var(--accent-color, #ff8888), color-mix(in srgb, var(--accent-color, #ff8888) 22%, transparent));
     box-shadow:
         inset 0 1px 0 rgba(255, 255, 255, 0.75),
         inset 0 -1px 0 rgba(0, 0, 0, 0.25),
@@ -356,18 +360,18 @@
 .lg-scrollbar--chat .lg-scrollbar-thumb:hover {
     background-image:
         linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.25)),
-        linear-gradient(180deg, color-mix(in srgb, var(--accent-color, #ff3737) 70%, transparent), color-mix(in srgb, var(--accent-color, #ff3737) 35%, transparent));
+        linear-gradient(180deg, color-mix(in srgb, var(--accent-color, #ff8888) 70%, transparent), color-mix(in srgb, var(--accent-color, #ff8888) 35%, transparent));
     box-shadow:
         inset 0 1px 0 rgba(255, 255, 255, 0.85),
         inset 0 -1px 0 rgba(0, 0, 0, 0.30),
-        0 0 16px color-mix(in srgb, var(--accent-color, #ff3737) 45%, transparent);
+        0 0 16px color-mix(in srgb, var(--accent-color, #ff8888) 45%, transparent);
 }
 
 .lg-scrollbar--chat .lg-scrollbar-thumb:active {
     box-shadow:
         inset 0 1px 0 rgba(255, 255, 255, 0.9),
         inset 0 -1px 0 rgba(0, 0, 0, 0.35),
-        0 0 18px color-mix(in srgb, var(--accent-color, #ff3737) 60%, transparent);
+        0 0 18px color-mix(in srgb, var(--accent-color, #ff8888) 60%, transparent);
 }
 
 html.lg-dragging,
