@@ -254,29 +254,133 @@ function markdownToHtml(mdText) {
     return htmlText;
 }
 
-function addCopyButtons() {
-    const containers = chatBoxEl.querySelectorAll(".code-container");
-    containers.forEach((container) => {
-        if (container.dataset.bound === "1") return;
-        container.dataset.bound = "1";
+// ======= 兼容性備用複製函式（同步、回傳 boolean） =======
+function fallbackCopyTextToClipboard(text) {
+    try {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        // 防止滾動到頁面底部或被看到
+        textArea.style.position = "fixed";
+        textArea.style.left = "-9999px";
+        textArea.style.top = "0";
+        textArea.setAttribute("readonly", "");
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
 
-        const btn = container.querySelector(".copy-button");
-        const codeEl = container.querySelector(".code-content");
-        if (!btn || !codeEl) return;
-
-        btn.addEventListener("click", async () => {
-            try {
-                await navigator.clipboard.writeText(codeEl.textContent || "");
-                btn.textContent = "已複製!";
-                setTimeout(() => (btn.textContent = "複製"), 2000);
-            } catch (e) {
-                console.error(e);
-                btn.textContent = "複製失敗";
-                setTimeout(() => (btn.textContent = "複製"), 2000);
-            }
-        });
-    });
+        // 嘗試 execCommand('copy')
+        const successful = document.execCommand('copy');
+        document.body.removeChild(textArea);
+        return !!successful;
+    } catch (err) {
+        try {
+            // 嘗試另一種方法（某些瀏覽器可能需要）
+            const textArea2 = document.createElement("textarea");
+            textArea2.value = text;
+            textArea2.style.position = "fixed";
+            textArea2.style.left = "-9999px";
+            textArea2.style.top = "0";
+            document.body.appendChild(textArea2);
+            textArea2.select();
+            const successful2 = document.execCommand('copy');
+            document.body.removeChild(textArea2);
+            return !!successful2;
+        } catch (err2) {
+            console.error('[fallbackCopy] 兩種傳統複製方式皆失敗', err2);
+            return false;
+        }
+    }
 }
+
+// ======= 事件代理版複製按鈕處理器（更強健） =======
+// 只呼叫一次： initCopyHandler(chatBoxEl)
+function initCopyHandler(chatBoxEl) {
+    if (!chatBoxEl) {
+        console.warn('[initCopyHandler] chatBoxEl 為空，請傳入 chatBoxEl DOM 節點');
+        return;
+    }
+
+    // 若已綁定過就不用重綁
+    if (chatBoxEl.__copyHandlerBound__) return;
+    chatBoxEl.__copyHandlerBound__ = true;
+
+    // 代理 click 事件到 .copy-button，能處理動態產生的按鈕
+    chatBoxEl.addEventListener('click', async (ev) => {
+        const btn = ev.target.closest ? ev.target.closest('.copy-button') : null;
+        if (!btn) return;
+
+        // 找到 code-container 與 code-content
+        const container = btn.closest('.code-container');
+        if (!container) {
+            console.warn('[copyHandler] 找不到 .code-container');
+            return;
+        }
+        const codeEl = container.querySelector('.code-content');
+        const textToCopy = (codeEl && codeEl.textContent) ? codeEl.textContent : '';
+
+        // UI：禁用按鈕避免多次點擊
+        const origText = btn.textContent;
+        btn.disabled = true;
+
+        // 嘗試現代 Clipboard API（只在 secure context / HTTPS 或 localhost 可用）
+        let done = false;
+        try {
+            if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+                // 有些瀏覽器需 secure context 才成功；若失敗會拋錯，落入 catch
+                await navigator.clipboard.writeText(textToCopy);
+                btn.textContent = '已複製!';
+                done = true;
+            }
+        } catch (err) {
+            console.warn('[copyHandler] navigator.clipboard.writeText 失敗，改用 fallback', err);
+            done = false;
+        }
+
+        // 若尚未成功，使用 fallback（同步）
+        if (!done) {
+            try {
+                const ok = fallbackCopyTextToClipboard(textToCopy);
+                if (ok) {
+                    btn.textContent = '已複製!';
+                    done = true;
+                } else {
+                    btn.textContent = '複製失敗';
+                }
+            } catch (err) {
+                console.error('[copyHandler] fallbackCopy 發生例外', err);
+                btn.textContent = '複製失敗';
+            }
+        }
+
+        // 若仍失敗，友善提示使用者手動選取
+        if (!done) {
+            // 也可以顯示更明確的 UI（alert 或小提示）
+            // alert('您的瀏覽器限制複製功能，請手動選取並複製。');
+            console.log('[copyHandler] 最後降級處理，請手動複製');
+        }
+
+        // 恢復按鈕文字與狀態
+        setTimeout(() => {
+            btn.textContent = origText || '複製';
+            btn.disabled = false;
+        }, 1800);
+    });
+
+    // 補上：若頁面已有 .code-container 但沒有 copy-button（或某些舊流程沒加按鈕），我們補上按鈕
+    const existingContainers = chatBoxEl.querySelectorAll('.code-container');
+    existingContainers.forEach((c) => {
+        if (!c.querySelector('.copy-button')) {
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'copy-button';
+            b.textContent = '複製';
+            // 放到 container 最前面（或你希望的位置）
+            c.insertBefore(b, c.firstChild);
+        }
+    });
+
+}
+
 
 function displayInitialMessage() {
     if (chatBoxEl.children.length > 0) return;
@@ -285,7 +389,6 @@ function displayInitialMessage() {
     const html = markdownToHtml(initial);
     chatBoxEl.innerHTML += `<p><b>小助手:</b> ${html}</p>`;
     chatBoxEl.scrollTo({ top: chatBoxEl.scrollHeight, behavior: 'smooth' });
-    addCopyButtons();
 }
 
 function renderMessage(role, content, isError = false) {
@@ -304,7 +407,6 @@ function renderMessage(role, content, isError = false) {
     } else {
         html = markdownToHtml(content);
         messageEl.innerHTML = `<b>${who}:</b> ${html}`;
-        addCopyButtons();
     }
 
     chatBoxEl.appendChild(messageEl);
@@ -542,4 +644,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (chatWidgetEl && window.__CHAT_OPEN__) {
         inputEl?.focus?.();
     }
+});
+document.addEventListener('DOMContentLoaded', () => {
+    initCopyHandler(document.getElementById('chat-box'));
 });

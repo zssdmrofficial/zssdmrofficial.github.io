@@ -386,7 +386,7 @@ html.lg-dragging * {
     padding: 8px 14px;
     font-size: 14px;
     font-weight: 600;
-    color: rgba(88, 86, 86, 1);
+    color: rgb(255, 255, 255);
     border-radius: 12px;
     z-index: 10000;
     opacity: 0;
