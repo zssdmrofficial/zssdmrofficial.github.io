@@ -1,5 +1,5 @@
 /* 自製 Liquid Glass 虛擬捲動軸（可重複實例：主頁面 + 聊天室 + 張國語錄文字版） */
-/* 版本 2.0.0 - 使用 Class 結構重構，同時保持舊有 API 相容性 */
+/* 版本 2.2.0 - 新增觸控慣性滑動 (Momentum Scrolling) */
 (function () {
     'use strict';
 
@@ -24,6 +24,8 @@
          * @param {number} [opts.wheelStep=60] - 滾輪滾動一次的距離 (px)
          * @param {number} [opts.easing=0.18] - 滾動平滑動畫的緩動係數 (0-1)
          * @param {number} [opts.autoHideMs=1600] - 停止活動後自動隱藏滾動條的延遲 (ms)
+         * @param {number} [opts.momentumFactor=120] - 觸控慣性滑動的動量因子，數值越大滑行越遠
+         * @param {number} [opts.momentumThreshold=0.1] - 觸發慣性滑動的速度閾值 (px/ms)
          */
         constructor(opts) {
             this.root = opts.root;
@@ -38,15 +40,32 @@
             this.wheelStep = opts.wheelStep || 60;
             this.easing = opts.easing || 0.18;
             this.autoHideMs = opts.autoHideMs || 1600;
+            // [新增] 慣性滑動設定
+            this.momentumFactor = opts.momentumFactor || 120;
+            this.momentumThreshold = opts.momentumThreshold || 0.1;
 
             // 內部狀態
             this.viewportH = 0; this.contentH = 0; this.maxScroll = 0;
             this.trackH = 0; this.thumbH = 0;
             this.scrollY = 0; this.targetY = 0;
             this.rafId = null; this.lastActiveTs = 0;
-            this.dragging = false; this.dragStartY = 0; this.dragStartScroll = 0;
+
+            // 統一拖曳狀態
+            this.dragging = false;
+            this.dragStartY = 0;
+            this.dragStartScroll = 0;
+            this.isThumbDrag = false;
+
+            // [新增] 慣性滑動所需狀態
+            this.velocity = 0;
+            this.velocityHistory = [];
+            this.lastMoveTime = 0;
+            this.lastMoveY = 0;
 
             this.prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+            this.root.style.touchAction = 'pan-y';
+            this.thumb.style.touchAction = 'none';
 
             this.bindEvents();
             this.measure();
@@ -67,7 +86,7 @@
 
             this.bar.classList.toggle('lg-hidden', this.maxScroll <= 1);
 
-            this.setTarget(this.targetY, true); // 校正位置
+            this.setTarget(this.targetY, true);
             this.updateThumb();
         }
 
@@ -161,29 +180,84 @@
             if (handled) e.preventDefault();
         }
 
-        handleThumbMousedown = (e) => {
+        handlePointerDown = (e) => {
+            if (e.button && e.button !== 0) return;
+
+            this.isThumbDrag = e.target === this.thumb;
+            if (!this.isThumbDrag && !this.content.contains(e.target)) return;
+
+            this.stopRAF(); // [修改] 開始拖曳時，立刻停止任何正在進行的動畫
+
             e.preventDefault();
             e.stopPropagation();
+
             this.dragging = true;
             this.dragStartY = e.clientY;
             this.dragStartScroll = this.scrollY;
             this.bar.classList.add('lg-visible');
             document.documentElement.classList.add('lg-dragging');
+
+            // [新增] 重置速度追蹤器
+            this.velocity = 0;
+            this.velocityHistory = [];
+            this.lastMoveTime = e.timeStamp;
+            this.lastMoveY = e.clientY;
+
+            (e.target).setPointerCapture(e.pointerId);
         }
 
-        handleWindowMousemove = (e) => {
+        handlePointerMove = (e) => {
             if (!this.dragging) return;
+
             const dy = e.clientY - this.dragStartY;
-            const range = Math.max(1, this.trackH - this.thumbH);
-            const scrollDelta = (dy / range) * this.maxScroll;
-            this.setTarget(this.dragStartScroll + scrollDelta, true); // 拖曳時立即更新
+
+            if (this.isThumbDrag) {
+                const range = Math.max(1, this.trackH - this.thumbH);
+                const scrollDelta = (dy / range) * this.maxScroll;
+                this.setTarget(this.dragStartScroll + scrollDelta, true);
+            } else {
+                this.setTarget(this.dragStartScroll - dy, true);
+
+                // [新增] 計算並記錄速度
+                const now = e.timeStamp;
+                const clientY = e.clientY;
+                const dt = now - this.lastMoveTime;
+                const dPos = clientY - this.lastMoveY;
+
+                if (dt > 0) {
+                    const currentVelocity = dPos / dt; // 單位: px/ms
+                    // 維持一個長度為 5 的速度歷史記錄
+                    this.velocityHistory.push(currentVelocity);
+                    if (this.velocityHistory.length > 5) {
+                        this.velocityHistory.shift();
+                    }
+                    // 計算平均速度
+                    this.velocity = this.velocityHistory.reduce((a, b) => a + b, 0) / this.velocityHistory.length;
+                }
+
+                this.lastMoveTime = now;
+                this.lastMoveY = clientY;
+            }
         }
 
-        handleWindowMouseup = () => {
+        handlePointerUp = (e) => {
             if (!this.dragging) return;
+
+            // [修改] 處理慣性滑動
+            if (!this.isThumbDrag && Math.abs(this.velocity) > this.momentumThreshold) {
+                // 根據最終速度計算滑行距離
+                const momentumDistance = this.velocity * this.momentumFactor;
+                // 注意方向：手指往下滑(velocity > 0)，內容要往上滾(scroll 減少)
+                const newTarget = this.scrollY - momentumDistance;
+                this.setTarget(newTarget, false); // 觸發平滑動畫
+            } else {
+                this.maybeAutoHideSoon(); // 如果沒有慣性，則正常檢查是否隱藏滾動條
+            }
+
             this.dragging = false;
+            this.isThumbDrag = false;
             document.documentElement.classList.remove('lg-dragging');
-            this.maybeAutoHideSoon();
+            (e.target).releasePointerCapture(e.pointerId);
         }
 
         handleTrackMousedown = (e) => {
@@ -200,24 +274,34 @@
         bindEvents() {
             this.root.addEventListener('wheel', this.handleWheel, { passive: false });
             window.addEventListener('keydown', this.handleKeyDown, { passive: false });
-            this.thumb.addEventListener('mousedown', this.handleThumbMousedown);
+
+            this.root.addEventListener('pointerdown', this.handlePointerDown);
+            this.thumb.addEventListener('pointerdown', this.handlePointerDown);
+
+            window.addEventListener('pointermove', this.handlePointerMove);
+            window.addEventListener('pointerup', this.handlePointerUp);
+            window.addEventListener('pointercancel', this.handlePointerUp);
+
             this.track.addEventListener('mousedown', this.handleTrackMousedown);
-            window.addEventListener('mousemove', this.handleWindowMousemove);
-            window.addEventListener('mouseup', this.handleWindowMouseup);
 
             this.ro = new ResizeObserver(this.measure);
             this.ro.observe(this.content);
-            this.ro.observe(this.root); // 也觀察根容器尺寸變化
+            this.ro.observe(this.root);
         }
 
         teardown() {
             this.stopRAF();
             this.root.removeEventListener('wheel', this.handleWheel);
             window.removeEventListener('keydown', this.handleKeyDown);
-            this.thumb.removeEventListener('mousedown', this.handleThumbMousedown);
+
+            this.root.removeEventListener('pointerdown', this.handlePointerDown);
+            this.thumb.removeEventListener('pointerdown', this.handlePointerDown);
+            window.removeEventListener('pointermove', this.handlePointerMove);
+            window.removeEventListener('pointerup', this.handlePointerUp);
+            window.removeEventListener('pointercancel', this.handlePointerUp);
+
             this.track.removeEventListener('mousedown', this.handleTrackMousedown);
-            window.removeEventListener('mousemove', this.handleWindowMousemove);
-            window.removeEventListener('mouseup', this.handleWindowMouseup);
+
             this.ro.disconnect();
             this.ro = null;
         }
@@ -225,31 +309,20 @@
         // --- Public API ---
         scrollTo(y) { this.setTarget(y); }
         scrollToEnd() {
-            this.measure(); // 滾動到底部前先重新測量，確保捕捉到最新高度
+            this.measure();
             this.setTarget(this.maxScroll, this.prefersReducedMotion);
         }
     }
 
 
     /**
-     * 建立一個可重複使用的虛擬捲動實例 (相容舊版的工廠函式)
-     * @param {Object} opts
-     * @param {HTMLElement} opts.root      － 滾動視窗（固定尺寸／裁切區）
-     * @param {HTMLElement} opts.content   － 內容容器（實際位移 transform）
-     * @param {HTMLElement} opts.bar       － 捲動軸外框（含 track + thumb）
-     * @param {HTMLElement} opts.track     － 捲動軌道
-     * @param {HTMLElement} opts.thumb     － 捲動滑塊
-     * @param {boolean}     opts.stopBubbleOnWheel － 是否攔截滾輪冒泡（避免影響外層）
+     * 工廠函式 (保持不變)
      */
     function createLGScroll(opts) {
-        // 檢查必要的 DOM 元素是否存在
         if (!opts.root || !opts.content || !opts.bar || !opts.track || !opts.thumb) {
             return null;
         }
-
         const scrollInstance = new LGScroll(opts);
-
-        // 回傳一個與舊版 API 完全相容的物件，內部代理到 Class 實例的方法
         return {
             measure: scrollInstance.measure,
             scrollTo: (y) => scrollInstance.scrollTo(y),
@@ -272,6 +345,8 @@
         track: document.querySelector('.lg-scrollbar:not(.lg-scrollbar--chat) .lg-scrollbar-track'),
         thumb: document.querySelector('.lg-scrollbar:not(.lg-scrollbar--chat) .lg-scrollbar-thumb'),
         stopBubbleOnWheel: false,
+        // 您可以在這裡微調主頁面的慣性手感
+        // momentumFactor: 150, 
     });
 
     // ==== 聊天室實例 (已修正) ====
@@ -279,7 +354,6 @@
     const chat = createLGScroll({
         root: chatRoot,
         content: document.getElementById('chat-scroll-content'),
-        // 使用與 quotes 和 main 實例一致的基礎選擇器 '.lg-scrollbar'
         bar: chatRoot ? chatRoot.querySelector('.lg-scrollbar') : null,
         track: chatRoot ? chatRoot.querySelector('.lg-scrollbar .lg-scrollbar-track') : null,
         thumb: chatRoot ? chatRoot.querySelector('.lg-scrollbar .lg-scrollbar-thumb') : null,
@@ -304,13 +378,11 @@
         const chatBox = document.getElementById('chat-box');
         if (!chatBox) return;
 
-        // 當聊天內容增加時，自動滾動到底部
         const mo = new MutationObserver(() => {
-            chat.scrollToEnd(); // 呼叫我們為 Class 設計的公開 API
+            chat.scrollToEnd();
         });
         mo.observe(chatBox, { childList: true, subtree: true, characterData: true });
 
-        // 觀察聊天視窗是否開啟 (確保捲軸在開啟時立即正確測量)
         const widget = document.getElementById('chat-widget');
         if (widget) {
             const io = new IntersectionObserver(() => {
