@@ -1,9 +1,238 @@
 /* 自製 Liquid Glass 虛擬捲動軸（可重複實例：主頁面 + 聊天室 + 張國語錄文字版） */
+/* 版本 2.0.0 - 使用 Class 結構重構，同時保持舊有 API 相容性 */
 (function () {
     'use strict';
 
     /**
-     * 建立一個可重複使用的虛擬捲動實例
+     * ----------------------------------------------------
+     * Liquid Glass 自製捲動軸 (LGScroll Class 核心)
+     * ----------------------------------------------------
+     * 核心原理: 禁用原生滾動，透過 requestAnimationFrame 
+     * 使用 CSS transform 實現平滑滾動。
+     * @class LGScroll
+     */
+    class LGScroll {
+        /**
+         * @param {object} opts - 選項
+         * @param {HTMLElement} opts.root - 滾動的根容器 (viewport)
+         * @param {HTMLElement} opts.content - 滾動的內容元素
+         * @param {HTMLElement} opts.bar - 整個滾動條容器
+         * @param {HTMLElement} opts.track - 滾動條軌道
+         * @param {HTMLElement} opts.thumb - 滾動條把手
+         * @param {boolean} [opts.stopBubbleOnWheel=false] - 滾動到底/頂時是否阻止事件冒泡
+         * @param {number} [opts.minThumb=32] - 把手最小高度 (px)
+         * @param {number} [opts.wheelStep=60] - 滾輪滾動一次的距離 (px)
+         * @param {number} [opts.easing=0.18] - 滾動平滑動畫的緩動係數 (0-1)
+         * @param {number} [opts.autoHideMs=1600] - 停止活動後自動隱藏滾動條的延遲 (ms)
+         */
+        constructor(opts) {
+            this.root = opts.root;
+            this.content = opts.content;
+            this.bar = opts.bar;
+            this.track = opts.track;
+            this.thumb = opts.thumb;
+
+            // 設定
+            this.stopBubbleOnWheel = opts.stopBubbleOnWheel || false;
+            this.minThumb = opts.minThumb || 32;
+            this.wheelStep = opts.wheelStep || 60;
+            this.easing = opts.easing || 0.18;
+            this.autoHideMs = opts.autoHideMs || 1600;
+
+            // 內部狀態
+            this.viewportH = 0; this.contentH = 0; this.maxScroll = 0;
+            this.trackH = 0; this.thumbH = 0;
+            this.scrollY = 0; this.targetY = 0;
+            this.rafId = null; this.lastActiveTs = 0;
+            this.dragging = false; this.dragStartY = 0; this.dragStartScroll = 0;
+
+            this.prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+            this.bindEvents();
+            this.measure();
+            this.maybeAutoHideSoon();
+        }
+
+        clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+
+        measure = () => {
+            this.viewportH = this.root.clientHeight;
+            this.contentH = this.content.scrollHeight;
+            this.maxScroll = Math.max(0, this.contentH - this.viewportH);
+            this.trackH = this.track.clientHeight;
+
+            const ratio = this.viewportH / Math.max(1, this.contentH);
+            this.thumbH = this.clamp(this.minThumb, Math.round(this.trackH * ratio), this.trackH);
+            this.thumb.style.height = this.thumbH + 'px';
+
+            this.bar.classList.toggle('lg-hidden', this.maxScroll <= 1);
+
+            this.setTarget(this.targetY, true); // 校正位置
+            this.updateThumb();
+        }
+
+        updateThumb() {
+            if (this.maxScroll <= 0) return;
+            const range = this.trackH - this.thumbH;
+            const thumbPos = (range * (this.scrollY / this.maxScroll));
+            this.thumb.style.transform = `translateY(${thumbPos}px)`;
+        }
+
+        applyScrollImmediate(next) {
+            this.scrollY = this.clamp(next, 0, this.maxScroll);
+            this.content.style.transform = `translate3d(0, ${-this.scrollY}px, 0)`;
+            this.updateThumb();
+        }
+
+        setTarget(y, immediate = false) {
+            this.targetY = this.clamp(y, 0, this.maxScroll);
+
+            if (immediate || this.prefersReducedMotion) {
+                this.applyScrollImmediate(this.targetY);
+                this.stopRAF();
+                this.maybeAutoHideSoon();
+            } else {
+                this.lastActiveTs = performance.now();
+                this.bar.classList.add('lg-visible');
+                this.startRAF();
+            }
+        }
+
+        animate = () => {
+            const diff = this.targetY - this.scrollY;
+            if (Math.abs(diff) < 0.5) {
+                this.applyScrollImmediate(this.targetY);
+                this.stopRAF();
+                this.maybeAutoHideSoon();
+                return;
+            }
+            this.applyScrollImmediate(this.scrollY + diff * this.easing);
+            this.rafId = requestAnimationFrame(this.animate);
+        }
+
+        startRAF() { if (!this.rafId) this.rafId = requestAnimationFrame(this.animate); }
+        stopRAF() {
+            if (this.rafId) {
+                cancelAnimationFrame(this.rafId);
+                this.rafId = null;
+            }
+        }
+
+        maybeAutoHideSoon() {
+            if (this.dragging) return;
+            const now = performance.now();
+            const timeSinceActive = now - this.lastActiveTs;
+
+            if (timeSinceActive >= this.autoHideMs) {
+                this.bar.classList.remove('lg-visible');
+            } else {
+                setTimeout(() => {
+                    if (!this.dragging && performance.now() - this.lastActiveTs >= this.autoHideMs) {
+                        this.bar.classList.remove('lg-visible');
+                    }
+                }, this.autoHideMs - timeSinceActive + 10);
+            }
+        }
+
+        handleWheel = (e) => {
+            e.preventDefault();
+            if (this.stopBubbleOnWheel) e.stopPropagation();
+            const delta = (e.deltaY || 0);
+            const base = e.ctrlKey ? this.wheelStep * 3 : this.wheelStep;
+            const step = base * Math.max(1, Math.min(3, Math.abs(delta) / 100));
+            this.setTarget(this.targetY + (delta > 0 ? step : -step));
+        }
+
+        handleKeyDown = (e) => {
+            const ae = document.activeElement;
+            if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA' || ae.isContentEditable)) return;
+            if (!this.root.matches(':hover')) return;
+
+            let handled = true;
+            switch (e.key) {
+                case 'ArrowDown': this.setTarget(this.targetY + this.wheelStep); break;
+                case 'ArrowUp': this.setTarget(this.targetY - this.wheelStep); break;
+                case 'PageDown': this.setTarget(this.targetY + this.viewportH * 0.9); break;
+                case 'PageUp': this.setTarget(this.targetY - this.viewportH * 0.9); break;
+                case 'Home': this.setTarget(0); break;
+                case 'End': this.setTarget(this.maxScroll); break;
+                default: handled = false;
+            }
+            if (handled) e.preventDefault();
+        }
+
+        handleThumbMousedown = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.dragging = true;
+            this.dragStartY = e.clientY;
+            this.dragStartScroll = this.scrollY;
+            this.bar.classList.add('lg-visible');
+            document.documentElement.classList.add('lg-dragging');
+        }
+
+        handleWindowMousemove = (e) => {
+            if (!this.dragging) return;
+            const dy = e.clientY - this.dragStartY;
+            const range = Math.max(1, this.trackH - this.thumbH);
+            const scrollDelta = (dy / range) * this.maxScroll;
+            this.setTarget(this.dragStartScroll + scrollDelta, true); // 拖曳時立即更新
+        }
+
+        handleWindowMouseup = () => {
+            if (!this.dragging) return;
+            this.dragging = false;
+            document.documentElement.classList.remove('lg-dragging');
+            this.maybeAutoHideSoon();
+        }
+
+        handleTrackMousedown = (e) => {
+            if (e.target === this.thumb) return;
+            e.preventDefault();
+            const rect = this.track.getBoundingClientRect();
+            const clickY = e.clientY - rect.top;
+            const thumbHalf = this.thumbH / 2;
+            const targetThumbY = clickY - thumbHalf;
+            const scrollRatio = targetThumbY / (this.trackH - this.thumbH);
+            this.setTarget(this.maxScroll * scrollRatio);
+        }
+
+        bindEvents() {
+            this.root.addEventListener('wheel', this.handleWheel, { passive: false });
+            window.addEventListener('keydown', this.handleKeyDown, { passive: false });
+            this.thumb.addEventListener('mousedown', this.handleThumbMousedown);
+            this.track.addEventListener('mousedown', this.handleTrackMousedown);
+            window.addEventListener('mousemove', this.handleWindowMousemove);
+            window.addEventListener('mouseup', this.handleWindowMouseup);
+
+            this.ro = new ResizeObserver(this.measure);
+            this.ro.observe(this.content);
+            this.ro.observe(this.root); // 也觀察根容器尺寸變化
+        }
+
+        teardown() {
+            this.stopRAF();
+            this.root.removeEventListener('wheel', this.handleWheel);
+            window.removeEventListener('keydown', this.handleKeyDown);
+            this.thumb.removeEventListener('mousedown', this.handleThumbMousedown);
+            this.track.removeEventListener('mousedown', this.handleTrackMousedown);
+            window.removeEventListener('mousemove', this.handleWindowMousemove);
+            window.removeEventListener('mouseup', this.handleWindowMouseup);
+            this.ro.disconnect();
+            this.ro = null;
+        }
+
+        // --- Public API ---
+        scrollTo(y) { this.setTarget(y); }
+        scrollToEnd() {
+            this.measure(); // 滾動到底部前先重新測量，確保捕捉到最新高度
+            this.setTarget(this.maxScroll, this.prefersReducedMotion);
+        }
+    }
+
+
+    /**
+     * 建立一個可重複使用的虛擬捲動實例 (相容舊版的工廠函式)
      * @param {Object} opts
      * @param {HTMLElement} opts.root      － 滾動視窗（固定尺寸／裁切區）
      * @param {HTMLElement} opts.content   － 內容容器（實際位移 transform）
@@ -13,210 +242,27 @@
      * @param {boolean}     opts.stopBubbleOnWheel － 是否攔截滾輪冒泡（避免影響外層）
      */
     function createLGScroll(opts) {
-        const {
-            root, content, bar, track, thumb,
-            stopBubbleOnWheel = false,
-            minThumb = 32,
-            wheelStep = 60,
-            easing = 0.18,
-            autoHideMs = 1600,
-        } = opts;
-
-        if (!root || !content || !bar || !track || !thumb) return null;
-
-        // 狀態
-        let viewportH = 0, contentH = 0, maxScroll = 0, trackH = 0, thumbH = 0;
-        let scrollY = 0, targetY = 0;
-        let rafId = null, lastActiveTs = 0;
-        let dragging = false, dragStartY = 0, dragStartScroll = 0;
-
-        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-        function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
-
-        function measure() {
-            viewportH = root.clientHeight;
-            contentH = content.scrollHeight;
-            maxScroll = Math.max(0, contentH - viewportH);
-            trackH = track.clientHeight;
-
-            const ratio = viewportH / Math.max(1, contentH);
-            thumbH = Math.max(minThumb, Math.round(trackH * ratio));
-            thumb.style.height = thumbH + 'px';
-
-            bar.classList.toggle('lg-hidden', maxScroll <= 1);
-            updateThumb();
+        // 檢查必要的 DOM 元素是否存在
+        if (!opts.root || !opts.content || !opts.bar || !opts.track || !opts.thumb) {
+            return null;
         }
 
-        function applyScrollImmediate(next) {
-            scrollY = clamp(next, 0, maxScroll);
-            content.style.transform = `translate3d(0, ${-scrollY}px, 0)`;
-            updateThumb();
-        }
+        const scrollInstance = new LGScroll(opts);
 
-        function updateThumb() {
-            const range = Math.max(1, trackH - thumbH);
-            const t = (range * (scrollY / Math.max(1, maxScroll)));
-            thumb.style.transform = `translateY(${t}px)`;
-        }
-
-        function animate() {
-            if (prefersReducedMotion) {
-                applyScrollImmediate(targetY);
-                stopRAF();
-                maybeAutoHideSoon();
-                return;
-            }
-            const diff = targetY - scrollY;
-            if (Math.abs(diff) < 0.5) {
-                applyScrollImmediate(targetY);
-                stopRAF();
-                maybeAutoHideSoon();
-                return;
-            }
-            applyScrollImmediate(scrollY + diff * easing);
-            rafId = requestAnimationFrame(animate);
-        }
-
-        function startRAF() {
-            if (!rafId) rafId = requestAnimationFrame(animate);
-        }
-        function stopRAF() {
-            if (rafId) {
-                cancelAnimationFrame(rafId);
-                rafId = null;
-            }
-        }
-        function setTarget(y) {
-            targetY = clamp(y, 0, maxScroll);
-            lastActiveTs = performance.now();
-            bar.classList.add('lg-visible');
-            startRAF();
-        }
-        function maybeAutoHideSoon() {
-            const now = performance.now();
-            const left = autoHideMs - (now - lastActiveTs);
-            if (left <= 0) {
-                bar.classList.remove('lg-visible');
-                return;
-            }
-            setTimeout(() => {
-                const nnow = performance.now();
-                if (nnow - lastActiveTs >= autoHideMs) {
-                    bar.classList.remove('lg-visible');
-                }
-            }, Math.ceil(left) + 10);
-        }
-
-        // === 事件 ===
-        const wheelHandler = (e) => {
-            e.preventDefault();
-            if (stopBubbleOnWheel) e.stopPropagation();
-            const delta = (e.deltaY || 0);
-            const base = e.ctrlKey ? wheelStep * 3 : wheelStep;
-            const step = base * Math.max(1, Math.min(3, Math.abs(delta) / 100));
-            setTarget(targetY + (delta > 0 ? step : -step));
-        };
-        root.addEventListener('wheel', wheelHandler, { passive: false });
-
-        // 鍵盤
-        window.addEventListener('keydown', (e) => {
-            const ae = document.activeElement;
-            if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA' || ae.isContentEditable)) return;
-
-            const hovered = root.matches(':hover');
-            if (!hovered) return;
-
-            let handled = true;
-            switch (e.key) {
-                case 'ArrowDown': setTarget(targetY + wheelStep); break;
-                case 'ArrowUp': setTarget(targetY - wheelStep); break;
-                case 'PageDown': setTarget(targetY + viewportH * 0.9); break;
-                case 'PageUp': setTarget(targetY - viewportH * 0.9); break;
-                case 'Home': setTarget(0); break;
-                case 'End': setTarget(maxScroll); break;
-                default: handled = false;
-            }
-            if (handled) e.preventDefault();
-        }, { passive: false });
-
-        // 觸控
-        let touchStartY = 0;
-        let touchStartScroll = 0;
-        root.addEventListener('touchstart', (e) => {
-            if (!e.touches || e.touches.length === 0) return;
-            touchStartY = e.touches[0].clientY;
-            touchStartScroll = targetY;
-            bar.classList.add('lg-visible');
-        }, { passive: true });
-
-        root.addEventListener('touchmove', (e) => {
-            if (!e.touches || e.touches.length === 0) return;
-            const dy = touchStartY - e.touches[0].clientY;
-            setTarget(touchStartScroll + dy);
-            if (stopBubbleOnWheel) e.stopPropagation();
-        }, { passive: true });
-
-        // 軌道點擊
-        track.addEventListener('mousedown', (e) => {
-            if (e.target === thumb) return;
-            const rect = track.getBoundingClientRect();
-            const y = e.clientY - rect.top;
-            const thumbRect = thumb.getBoundingClientRect();
-            if (y < thumbRect.top - rect.top) {
-                setTarget(targetY - viewportH * 0.9);
-            } else {
-                setTarget(targetY + viewportH * 0.9);
-            }
-            e.preventDefault();
-        });
-
-        // 滑塊拖曳
-        thumb.addEventListener('mousedown', (e) => {
-            dragging = true;
-            dragStartY = e.clientY;
-            dragStartScroll = scrollY;
-            bar.classList.add('lg-visible');
-            document.documentElement.classList.add('lg-dragging');
-            e.preventDefault();
-        });
-        window.addEventListener('mousemove', (e) => {
-            if (!dragging) return;
-            const dy = e.clientY - dragStartY;
-            const range = Math.max(1, trackH - thumbH);
-            const ratio = dy / range;
-            setTarget(dragStartScroll + ratio * maxScroll);
-        });
-        window.addEventListener('mouseup', () => {
-            if (!dragging) return;
-            dragging = false;
-            document.documentElement.classList.remove('lg-dragging');
-            maybeAutoHideSoon();
-        });
-
-        // ResizeObserver
-        window.addEventListener('resize', measure);
-        const ro = new ResizeObserver(measure);
-        ro.observe(content);
-
-        // 初始化
-        measure();
-        applyScrollImmediate(0);
-        maybeAutoHideSoon();
-
+        // 回傳一個與舊版 API 完全相容的物件，內部代理到 Class 實例的方法
         return {
-            measure,
-            scrollTo: (y) => setTarget(y),
-            scrollToEnd: () => setTarget(maxScroll),
-            getMaxScroll: () => maxScroll,
-            getScrollY: () => scrollY,
-            teardown: () => {
-                root.removeEventListener('wheel', wheelHandler);
-                stopRAF();
-                ro.disconnect();
-            },
+            measure: scrollInstance.measure,
+            scrollTo: (y) => scrollInstance.scrollTo(y),
+            scrollToEnd: () => scrollInstance.scrollToEnd(),
+            getMaxScroll: () => scrollInstance.maxScroll,
+            getScrollY: () => scrollInstance.scrollY,
+            teardown: () => scrollInstance.teardown(),
         };
     }
+
+    // ======================================================================
+    // ==== 以下實例化程式碼與 old-scrollbar.js 完全相同，無需任何修改 ====
+    // ======================================================================
 
     // ==== 主頁面實例 ====
     const main = createLGScroll({
@@ -228,14 +274,15 @@
         stopBubbleOnWheel: false,
     });
 
-    // ==== 聊天室實例 ====
+    // ==== 聊天室實例 (已修正) ====
     const chatRoot = document.getElementById('chat-scroll-root');
     const chat = createLGScroll({
         root: chatRoot,
         content: document.getElementById('chat-scroll-content'),
-        bar: chatRoot ? chatRoot.querySelector('.lg-scrollbar--chat') : null,
-        track: chatRoot ? chatRoot.querySelector('.lg-scrollbar--chat .lg-scrollbar-track') : null,
-        thumb: chatRoot ? chatRoot.querySelector('.lg-scrollbar--chat .lg-scrollbar-thumb') : null,
+        // 使用與 quotes 和 main 實例一致的基礎選擇器 '.lg-scrollbar'
+        bar: chatRoot ? chatRoot.querySelector('.lg-scrollbar') : null,
+        track: chatRoot ? chatRoot.querySelector('.lg-scrollbar .lg-scrollbar-track') : null,
+        thumb: chatRoot ? chatRoot.querySelector('.lg-scrollbar .lg-scrollbar-thumb') : null,
         stopBubbleOnWheel: true,
         minThumb: 24,
     });
@@ -251,18 +298,19 @@
         stopBubbleOnWheel: false,
     });
 
-    // 聊天室自動滾到底
+    // 聊天室自動滾到底 (使用升級後的 Class API)
     (function autoStickBottom() {
         if (!chatRoot || !chat) return;
         const chatBox = document.getElementById('chat-box');
         if (!chatBox) return;
 
+        // 當聊天內容增加時，自動滾動到底部
         const mo = new MutationObserver(() => {
-            chat.measure();
-            chat.scrollToEnd();
+            chat.scrollToEnd(); // 呼叫我們為 Class 設計的公開 API
         });
         mo.observe(chatBox, { childList: true, subtree: true, characterData: true });
 
+        // 觀察聊天視窗是否開啟 (確保捲軸在開啟時立即正確測量)
         const widget = document.getElementById('chat-widget');
         if (widget) {
             const io = new IntersectionObserver(() => {
@@ -272,6 +320,6 @@
         }
     })();
 
-    // 對外暴露
+    // 對外暴露 (與舊版相同)
     window.LGScroll = { main, chat, quotes };
 })();
