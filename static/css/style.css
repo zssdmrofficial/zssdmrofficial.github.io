@@ -65,16 +65,16 @@ body {
     font-family: "Noto Sans TC", "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     background-color: #000;
     animation: fadeIn 1s ease-out;
-    scrollbar-width: none;
+    /* --- REMOVED --- 
+     * 移除了以下兩行，以顯示瀏覽器原生捲動軸
+     * scrollbar-width: none; 
+     */
 }
 
-body.no-native-scroll {
-    overflow: hidden;
-}
-
-body::-webkit-scrollbar {
-    display: none;
-}
+/* --- REMOVED --- 
+ * 移除了 body.no-native-scroll 和 body::-webkit-scrollbar 相關規則，
+ * 因為不再需要隱藏原生捲動軸。
+ */
 
 p {
     margin: 0;
@@ -92,13 +92,10 @@ p {
     border: 0 !important;
 }
 
-@media (prefers-reduced-motion: reduce) {
-
-    .lg-scrollbar,
-    .lg-scrollbar-thumb {
-        transition: none;
-    }
-}
+/* --- REMOVED --- 
+ * 移除了 @media (prefers-reduced-motion) 區塊，
+ * 因為它只包含針對已刪除的 .lg-scrollbar 的樣式。
+ */
 
 /* ===== 背景（加入統一粉紅氛圍） ===== */
 .full-bg {
@@ -263,101 +260,14 @@ section p {
     color: var(--text-secondary);
 }
 
-/* ===== 自製卷軸（粉紅） ===== */
-.lg-scroll-root {
-    position: fixed;
-    inset: 0;
-    overflow: hidden;
-    z-index: 1;
-}
-
-.lg-scroll-content {
-    position: absolute;
-    inset: 0 auto auto 0;
-    width: 100%;
-    will-change: transform;
-    transform: translate3d(0, 0, 0);
-}
-
-.lg-scrollbar {
-    position: fixed;
-    top: 0;
-    right: 12px;
-    bottom: 0;
-    width: 14px;
-    z-index: 30;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity .25s ease;
-}
-
-.lg-scrollbar.lg-visible {
-    opacity: 1;
-}
-
-.lg-scrollbar.lg-hidden {
-    display: none;
-}
-
-.lg-scrollbar-track {
-    position: absolute;
-    left: 0;
-    top: 16px;
-    bottom: 16px;
-    width: 14px;
-    border-radius: 999px;
-    backdrop-filter: blur(14px) saturate(180%);
-    -webkit-backdrop-filter: blur(14px) saturate(180%);
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.05));
-    border: 1px solid color-mix(in srgb, var(--accent-color) 28%, white 20%);
-    box-shadow:
-        inset 0 0 0 1px rgba(255, 255, 255, 0.06),
-        0 4px 18px rgba(0, 0, 0, 0.25);
-    pointer-events: auto;
-}
-
-.lg-scrollbar-thumb {
-    position: absolute;
-    left: 0;
-    top: 16px;
-    width: 14px;
-    height: 48px;
-    border-radius: 999px;
-    border: 3px solid transparent;
-    background-clip: padding-box;
-    background-image:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0.15)),
-        linear-gradient(180deg, var(--accent-strong), color-mix(in srgb, var(--accent-color) 24%, transparent));
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.75),
-        inset 0 -1px 0 rgba(0, 0, 0, 0.25),
-        0 0 12px var(--accent-glow);
-    transition: box-shadow .15s ease, background-image .15s ease, transform .05s linear;
-    cursor: grab;
-    pointer-events: auto;
-}
-
-html.lg-dragging,
-html.lg-dragging * {
-    cursor: grabbing !important;
-}
-
-.lg-scrollbar-thumb:hover {
-    background-image:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.58), rgba(255, 255, 255, 0.25)),
-        linear-gradient(180deg, color-mix(in srgb, var(--accent-color) 78%, white 5%), color-mix(in srgb, var(--accent-color) 35%, transparent));
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.85),
-        inset 0 -1px 0 rgba(0, 0, 0, 0.3),
-        0 0 16px color-mix(in srgb, var(--accent-color) 50%, transparent);
-}
-
-.lg-scrollbar-thumb:active {
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.9),
-        inset 0 -1px 0 rgba(0, 0, 0, 0.35),
-        0 0 18px color-mix(in srgb, var(--accent-color) 55%, transparent);
-}
+/* --- REMOVED --- 
+ * 整個 /* ===== 自製卷軸（粉紅） ===== */
+區塊已被刪除。 * 這包括 .lg-scroll-root,
+.lg-scroll-content,
+.lg-scrollbar,
+* .lg-scrollbar-track,
+.lg-scrollbar-thumb,
+html.lg-dragging * 等所有相關的 CSS 規則。 */
 
 /* ===== Chat 元件滾動限制 ===== */
 #chat-widget,
@@ -604,4 +514,47 @@ html.lg-dragging * {
 
 .quotes-header h2 {
     margin: 0;
+}
+
+html,
+body {
+    /* 讓滾動軸浮在內容上方 */
+    overflow-y: overlay;
+    background-color: transparent;
+}
+
+/* WebKit／Blink 瀏覽器（Chrome／Edge／Safari） */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+    background: transparent;
+    /* 嘗試覆蓋基底 */
+}
+
+::-webkit-scrollbar-track {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.12);
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    transition: background-color 0.25s ease, transform 0.25s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(255, 255, 255, 0.25);
+    transform: scaleX(1.15);
+}
+
+/* Firefox */
+html {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
 }
