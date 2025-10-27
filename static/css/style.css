@@ -563,7 +563,7 @@ html {
 #quotes-text-root,
 #flag-root {
     /* 讓它擁有和首頁一樣的居中、限寬效果 */
-    max-width: var(--maxw-content);
+    /* max-width: var(--maxw-content); */
     /* 最大寬度 700px */
     margin: 40px auto 120px;
     /* 上下邊距，左右 auto 實現水平居中 */
