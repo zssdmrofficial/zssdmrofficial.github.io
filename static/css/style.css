@@ -558,3 +558,15 @@ html {
     scrollbar-width: thin;
     scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
 }
+
+/* ===== 設定文字版語錄頁面的主容器佈局 ===== */
+#quotes-text-root,
+#flag-root {
+    /* 讓它擁有和首頁一樣的居中、限寬效果 */
+    max-width: var(--maxw-content);
+    /* 最大寬度 700px */
+    margin: 40px auto 120px;
+    /* 上下邊距，左右 auto 實現水平居中 */
+    padding: 0 20px;
+    /* 左右內距 20px，避免在小螢幕貼邊 */
+}
