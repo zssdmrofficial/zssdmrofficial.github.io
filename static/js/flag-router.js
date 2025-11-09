@@ -1,4 +1,5 @@
 function handleFlagRoute() {
+    const hash = location.hash;
     const mainRoot = document.getElementById("main-content");
     const quotesRoot = document.getElementById("quotes-text-root");
     const flagRoot = document.getElementById("flag-root");
@@ -7,7 +8,7 @@ function handleFlagRoute() {
         return;
     }
 
-    if (location.hash === "#flag") {
+    if (hash === "#flag") {
         if (mainRoot) {
             mainRoot.style.display = "none";
         }
@@ -17,7 +18,7 @@ function handleFlagRoute() {
         flagRoot.style.display = "block";
     } else {
         flagRoot.style.display = "none";
-        if (mainRoot) {
+        if (mainRoot && hash !== "#quotes-text") {
             mainRoot.style.display = "block";
         }
     }

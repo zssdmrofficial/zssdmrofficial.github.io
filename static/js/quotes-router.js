@@ -1,8 +1,11 @@
+// 載入 Markdown 並渲染至指定容器
 async function loadMarkdown(path, containerId) {
     try {
         const res = await fetch(path);
+        if (!res.ok) throw new Error("無法讀取 Markdown 檔案");
         const text = await res.text();
         document.getElementById(containerId).innerHTML = marked.parse(text);
+        // 若有 LGScroll（你的自訂捲動效果）則重新測量
         if (window.LGScroll && window.LGScroll.quotes) {
             window.LGScroll.quotes.measure();
         }
@@ -12,20 +15,36 @@ async function loadMarkdown(path, containerId) {
     }
 }
 
+// 通用路由控制：統一檢測 hash 並顯示相對應區塊
 function handleRoute() {
-    const hash = window.location.hash;
-    const mainContent = document.getElementById("main-content");
-    const quotesTextRoot = document.getElementById("quotes-text-root");
+    const hash = location.hash;
+    const mainRoot = document.getElementById("main-content");
+    const quotesRoot = document.getElementById("quotes-text-root");
+    const flagRoot = document.getElementById("flag-root");
 
-    if (hash === "#quotes-text") {
-        mainContent.style.display = "none";
-        quotesTextRoot.style.display = "block";
+    // 若主體不存在就不執行（防呆）
+    if (!mainRoot) return;
+
+    // 預設全部隱藏
+    if (quotesRoot) quotesRoot.style.display = "none";
+    if (flagRoot) flagRoot.style.display = "none";
+    mainRoot.style.display = "none";
+
+    // 根據 hash 顯示正確頁面
+    if (hash === "#quotes-text" && quotesRoot) {
+        quotesRoot.style.display = "block";
         loadMarkdown("/assets/張國語錄文字版.md", "quotes-text-container");
+        requestAnimationFrame(() => {
+            window.scrollTo(0, 0);
+            quotesRoot.scrollTop = 0;
+        });
+    } else if (hash === "#flag" && flagRoot) {
+        flagRoot.style.display = "block";
     } else {
-        mainContent.style.display = "block";
-        quotesTextRoot.style.display = "none";
+        mainRoot.style.display = "block";
     }
 }
 
-window.addEventListener("load", handleRoute);
+// 等 HTML 結構載入完畢就初始化（不必等圖片）
+window.addEventListener("DOMContentLoaded", handleRoute);
 window.addEventListener("hashchange", handleRoute);
