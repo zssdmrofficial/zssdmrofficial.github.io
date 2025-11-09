@@ -11,7 +11,7 @@ async function loadMarkdown(path, containerId) {
         }
     } catch (err) {
         document.getElementById(containerId).innerHTML =
-            "<p style='color:red;'>載入失敗 (｡>﹏<｡)</p>";
+            "<p style='color:red;'>載入失敗</p>";
     }
 }
 
