@@ -1,23 +1,15 @@
 :root {
-    /* === 粉紅主題色票（統一色系） === */
     --accent-color: #ff8888;
-    /* 主粉紅：鮮明 */
     --accent-strong: color-mix(in srgb, var(--accent-color) 85%, white 15%);
     --accent-soft: color-mix(in srgb, var(--accent-color) 40%, white 10%);
     --accent-glow: color-mix(in srgb, var(--accent-color) 35%, transparent);
     --accent-shadow: color-mix(in srgb, var(--accent-color) 25%, black 45%);
-
-    /* === 文字與背景 === */
     --text-primary: #ffffff;
     --text-secondary: rgba(255, 255, 255, 0.78);
     --bg-dark-overlay: rgba(0, 0, 0, 0.55);
-    /* 微粉的卡片霧面底，保持可讀性 */
     --content-bg: rgba(255, 255, 255, 0.06);
-
-    /* === 圓角與版心 === */
     --radius-ui: 24px;
     --border-radius: var(--radius-ui);
-    /* 修正原本樣式中使用 var(--border-radius) 的地方 */
     --maxw-content: 700px;
 }
 
@@ -65,16 +57,7 @@ body {
     font-family: "Noto Sans TC", "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     background-color: #000;
     animation: fadeIn 1s ease-out;
-    /* --- REMOVED --- 
-     * 移除了以下兩行，以顯示瀏覽器原生捲動軸
-     * scrollbar-width: none; 
-     */
 }
-
-/* --- REMOVED --- 
- * 移除了 body.no-native-scroll 和 body::-webkit-scrollbar 相關規則，
- * 因為不再需要隱藏原生捲動軸。
- */
 
 p {
     margin: 0;
@@ -92,12 +75,6 @@ p {
     border: 0 !important;
 }
 
-/* --- REMOVED --- 
- * 移除了 @media (prefers-reduced-motion) 區塊，
- * 因為它只包含針對已刪除的 .lg-scrollbar 的樣式。
- */
-
-/* ===== 背景（加入統一粉紅氛圍） ===== */
 .full-bg {
     position: fixed;
     top: 0;
@@ -126,7 +103,6 @@ p {
     z-index: -1;
 }
 
-/* ===== 液態玻璃：統一粉紅調光澤 ===== */
 .liquid_glass-wrapper {
     position: relative;
     display: flex;
@@ -188,7 +164,6 @@ p {
     justify-content: center;
 }
 
-/* ===== 版心與卡片 ===== */
 .main-container {
     width: 100%;
     max-width: var(--maxw-content);
@@ -232,7 +207,6 @@ section:nth-child(4) {
     box-shadow: 0 8px 26px color-mix(in srgb, var(--accent-color) 35%, transparent);
 }
 
-/* ===== 標題與段落（統一粉紅主色） ===== */
 header h1 {
     font-size: clamp(32px, 4vw, 48px);
     font-weight: 800;
@@ -260,22 +234,11 @@ section p {
     color: var(--text-secondary);
 }
 
-/* --- REMOVED --- 
- * 整個 /* ===== 自製卷軸（粉紅） ===== */
-區塊已被刪除。 * 這包括 .lg-scroll-root,
-.lg-scroll-content,
-.lg-scrollbar,
-* .lg-scrollbar-track,
-.lg-scrollbar-thumb,
-html.lg-dragging * 等所有相關的 CSS 規則。 */
-
-/* ===== Chat 元件滾動限制 ===== */
 #chat-widget,
 #chat-widget * {
     overscroll-behavior: contain;
 }
 
-/* ===== 登入彈窗（粉紅） ===== */
 .login-toggle-btn {
     position: fixed;
     top: 20px;
@@ -400,7 +363,6 @@ html.lg-dragging * 等所有相關的 CSS 規則。 */
     text-align: center;
 }
 
-/* ===== 語錄區（粉紅卡框與控制） ===== */
 .quotes-container {
     width: 100%;
     max-width: 480px;
@@ -458,7 +420,6 @@ html.lg-dragging * 等所有相關的 CSS 規則。 */
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
 }
 
-/* ===== 粉紅強調連結與 Markdown 容器 ===== */
 .liquid-glass-link {
     display: inline-block;
     padding: 10px 20px;
@@ -505,7 +466,6 @@ html.lg-dragging * 等所有相關的 CSS 規則。 */
     text-decoration: underline;
 }
 
-/* ===== 語錄 Header ===== */
 .quotes-header {
     display: flex;
     align-items: center;
@@ -518,17 +478,14 @@ html.lg-dragging * 等所有相關的 CSS 規則。 */
 
 html,
 body {
-    /* 讓滾動軸浮在內容上方 */
     overflow-y: overlay;
     background-color: transparent;
 }
 
-/* WebKit／Blink 瀏覽器（Chrome／Edge／Safari） */
 ::-webkit-scrollbar {
     width: 10px;
     height: 10px;
     background: transparent;
-    /* 嘗試覆蓋基底 */
 }
 
 ::-webkit-scrollbar-track {
@@ -553,20 +510,13 @@ body {
     transform: scaleX(1.15);
 }
 
-/* Firefox */
 html {
     scrollbar-width: thin;
     scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
 }
 
-/* ===== 設定文字版語錄頁面的主容器佈局 ===== */
 #quotes-text-root,
 #flag-root {
-    /* 讓它擁有和首頁一樣的居中、限寬效果 */
-    /* max-width: var(--maxw-content); */
-    /* 最大寬度 700px */
     margin: 40px auto 120px;
-    /* 上下邊距，左右 auto 實現水平居中 */
     padding: 0 20px;
-    /* 左右內距 20px，避免在小螢幕貼邊 */
 }

@@ -12,7 +12,6 @@
     --accent-color: var(--accent-color, #ff8888);
 }
 
-
 @keyframes shake {
 
     0%,
@@ -64,7 +63,6 @@
 
 .chat-toggle-button:hover {
     transform: scale(1.1);
-    /* 由藍改粉：更亮的主色 */
     background: color-mix(in srgb, var(--accent-color, #ff8888) 88%, white 12%);
     box-shadow: 0 0 20px color-mix(in srgb, var(--accent-color, #ff8888) 60%, transparent);
 }
@@ -148,11 +146,9 @@
     scrollbar-color: var(--scrollbar-thumb, var(--scrollbar-thumb-fallback)) var(--scrollbar-track);
 }
 
-/* WebKit 卷軸（維持結構、改顏色） */
 .chat-box:hover::-webkit-scrollbar-thumb {
     background-image:
         linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.20)),
-        /* 第二層由藍改粉 */
         linear-gradient(180deg, var(--scrollbar-thumb-hover, var(--scrollbar-thumb-hover-fallback)), color-mix(in srgb, var(--accent-color, #ff8888) 35%, transparent));
     box-shadow:
         inset 0 1px 0 rgba(255, 255, 255, 0.85),
@@ -160,9 +156,7 @@
         0 0 18px var(--scrollbar-glow);
 }
 
-/* 修改後的 CSS */
 .chat-box .message-wrapper {
-    /* ★ 修改這裡的選擇器 */
     margin: 10px 0;
     padding: 10px 12px;
     line-height: 1.6;
@@ -187,7 +181,6 @@
 
 .chat-box b {
     color: var(--accent-color, #ff8888);
-    /* 由淡粉改成主色強調 */
 }
 
 .chat-input-area {
@@ -229,7 +222,6 @@
 }
 
 .chat-send-button:hover {
-    /* 由藍改粉 */
     background: color-mix(in srgb, var(--accent-color, #ff8888) 90%, white 10%);
 }
 
@@ -278,7 +270,6 @@
 
 .copy-button:hover {
     opacity: 1;
-    /* 由藍改粉 */
     background-color: color-mix(in srgb, var(--accent-color, #ff8888) 88%, white 12%);
 }
 
@@ -299,7 +290,6 @@
     animation: slideInFromBottom 0.5s ease-out forwards;
 }
 
-/* ===== Chat 自訂卷軸（套粉紅） ===== */
 .lg-scrollbar--chat {
     position: absolute;
     top: 6px;
@@ -348,7 +338,6 @@
     background-clip: padding-box;
     background-image:
         linear-gradient(180deg, rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0.15)),
-        /* 第二層由藍改粉 */
         linear-gradient(180deg, var(--accent-color, #ff8888), color-mix(in srgb, var(--accent-color, #ff8888) 22%, transparent));
     box-shadow:
         inset 0 1px 0 rgba(255, 255, 255, 0.75),

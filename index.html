@@ -32,12 +32,11 @@
     </svg>
 </head>
 
-<body> <!-- 移除了 no-native-scroll class -->
+<body>
     <div class="full-bg">
         <img src="static/images/background.png" />
     </div>
 
-    <!-- 移除了 lg-scroll-root 和 lg-scroll-content 包裹層 -->
     <div class="main-container" id="main-content">
         <header class="content-card">
             <h1>張師社會主義民主共和國</h1>
@@ -116,8 +115,6 @@
         </div>
     </div>
 
-    <!-- 移除了 lg-scrollbar 元素 -->
-
     <div id="chat-toggle" class="chat-toggle-button" aria-label="開啟聊天室">
         <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -137,7 +134,6 @@
             <div class="chat-content">
                 <div class="chat-header">思想小助手</div>
 
-                <!-- 這裡的結構稍微修改，直接讓 chat-scroll-root 成為可滾動區域 -->
                 <div id="chat-scroll-root" class="chat-scroll-root" role="region" aria-label="聊天訊息滾動區"
                     style="overflow-y: auto; height: 100%;">
                     <div id="chat-scroll-content" class="chat-scroll-content">
@@ -154,7 +150,6 @@
     </div>
 
     <div id="quotes-text-root" style="display:none;" role="region" aria-label="張國語錄文字版">
-        <!-- 移除了 lg-scroll-root 和 lg-scroll-content 包裹層 -->
         <section id="quotes-text-section" class="content-card quotes-section" aria-live="polite">
             <div class="quotes-header">
                 <h2>張國語錄文字版</h2>
@@ -165,11 +160,9 @@
             <br />
             <div id="quotes-text-container" class="liquid-glass-md"></div>
         </section>
-        <!-- 移除了 lg-scrollbar 元素 -->
     </div>
 
     <div id="flag-root" style="display:none;" role="region" aria-label="國旗展示">
-        <!-- 移除了 lg-scroll-root 和 lg-scroll-content 包裹層 -->
         <section class="content-card">
             <div class="quotes-header">
                 <h2>張師社會主義民主共和國國旗</h2>
@@ -182,7 +175,6 @@
             <img src="assets/張師社會主義民主共和國國旗.png" alt="張師社會主義民主共和國國旗"
                 style="max-width:90%;height:auto;border-radius:16px;box-shadow:0 8px 20px rgba(0,0,0,0.2);" />
         </section>
-        <!-- 移除了 lg-scrollbar 元素 -->
     </div>
 
     <script src="static/js/marked.min.js"></script>
