@@ -4,9 +4,6 @@ async function loadMarkdown(path, containerId) {
         if (!res.ok) throw new Error("無法讀取 Markdown 檔案");
         const text = await res.text();
         document.getElementById(containerId).innerHTML = marked.parse(text);
-        if (window.LGScroll && window.LGScroll.quotes) {
-            window.LGScroll.quotes.measure();
-        }
     } catch (err) {
         document.getElementById(containerId).innerHTML =
             "<p style='color:red;'>載入失敗</p>";
