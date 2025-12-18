@@ -100,5 +100,3 @@ ${ZHANG_QUOTES_MD}
 
 ================================================
 ${RED_COSMOLOGY_MD}`;
-
-console.log(SYSTEM_INSTRUCTION)
