@@ -24,7 +24,7 @@ function handleRoute() {
 
     if (hash === "#quotes-text" && quotesRoot) {
         quotesRoot.style.display = "block";
-        loadMarkdown("/assets/張國語錄文字版.md", "quotes-text-container");
+        loadMarkdown("/static/md/張國語錄文字版.md", "quotes-text-container");
         requestAnimationFrame(() => {
             window.scrollTo(0, 0);
             quotesRoot.scrollTop = 0;
