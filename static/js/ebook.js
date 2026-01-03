@@ -31,16 +31,46 @@ const quotesImages = [
 ];
 
 let currentIndex = 0;
-const quotesImg = document.getElementById("quotes-img");
+const container = document.getElementById("quotes-container");
+const imageNodes = [];
 
-function showImage(index) {
-    if (index < 0 || index >= quotesImages.length) return;
-    currentIndex = index;
-    quotesImg.src = quotesImages[currentIndex];
+function initImages() {
+    if (!container) return;
+    container.innerHTML = "";
 
+    quotesImages.forEach((src, index) => {
+        const img = document.createElement("img");
+        img.src = src;
+        img.loading = "eager";
+        img.alt = "張國語錄圖片";
+        img.style.display = index === 0 ? "block" : "none";
+        img.style.maxWidth = "100%";
+        img.style.maxHeight = "100%";
+        img.style.objectFit = "contain";
+        img.style.borderRadius = "12px";
+
+        container.appendChild(img);
+        imageNodes.push(img);
+    });
+
+    updateIndicator();
+}
+
+function updateIndicator() {
     const parts = quotesImages[currentIndex].split("/");
     let filename = parts[parts.length - 1].replace(/\.(jpg|jpeg|png)$/i, "");
-    document.getElementById("page-indicator").textContent = filename;
+    const indicator = document.getElementById("page-indicator");
+    if (indicator) indicator.textContent = filename;
+}
+
+function showImage(index) {
+    if (index < 0 || index >= imageNodes.length) return;
+
+    imageNodes[currentIndex].style.display = "none";
+    currentIndex = index;
+    imageNodes[currentIndex].style.display = "block";
+
+    updateIndicator();
 }
 
 function showPrevImage() {
@@ -51,7 +81,7 @@ function showNextImage() {
     if (currentIndex < quotesImages.length - 1) showImage(currentIndex + 1);
 }
 
-showImage(0);
+initImages();
 
 window.addEventListener("keydown", (e) => {
     if (e.key === "ArrowLeft") showPrevImage();
