@@ -1,12 +1,11 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-TW">
-
-<head>
+  <head>
     <meta charset="UTF-8" />
     <title>張師社會主義民主共和國 - 官方網站</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <link rel="icon" type="image/x-icon" href="static/images/favicon.ico">
+    <link rel="icon" type="image/x-icon" href="static/images/favicon.ico" />
 
     <link rel="stylesheet" href="static/css/style.css" />
     <link rel="stylesheet" href="static/css/chat.css" />
@@ -14,194 +13,324 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Noto+Sans+TC:wght@400;700&display=swap"
-        rel="stylesheet" />
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Noto+Sans+TC:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
 
     <svg style="position: fixed; width: 0; height: 0" aria-hidden="true">
-        <defs>
-            <filter id="liquid_glass_filter" x="-20%" y="-20%" width="140%" height="140%"
-                filterUnits="objectBoundingBox">
-                <feTurbulence type="fractalNoise" baseFrequency="0.01 0.015" numOctaves="2" seed="10" result="noise">
-                    <animate attributeName="baseFrequency" dur="16s" values="0.01 0.015; 0.015 0.01; 0.01 0.015"
-                        repeatCount="indefinite" />
-                </feTurbulence>
-                <feDisplacementMap in="SourceGraphic" in2="noise" scale="30" xChannelSelector="R"
-                    yChannelSelector="G" />
-            </filter>
-        </defs>
+      <defs>
+        <filter
+          id="liquid_glass_filter"
+          x="-20%"
+          y="-20%"
+          width="140%"
+          height="140%"
+          filterUnits="objectBoundingBox"
+        >
+          <feTurbulence
+            type="fractalNoise"
+            baseFrequency="0.01 0.015"
+            numOctaves="2"
+            seed="10"
+            result="noise"
+          >
+            <animate
+              attributeName="baseFrequency"
+              dur="16s"
+              values="0.01 0.015; 0.015 0.01; 0.01 0.015"
+              repeatCount="indefinite"
+            />
+          </feTurbulence>
+          <feDisplacementMap
+            in="SourceGraphic"
+            in2="noise"
+            scale="30"
+            xChannelSelector="R"
+            yChannelSelector="G"
+          />
+        </filter>
+      </defs>
     </svg>
-</head>
+  </head>
 
-<body>
+  <body>
     <div class="full-bg">
-        <img src="static/images/background.png" />
+      <img src="static/images/background.png" />
     </div>
 
     <div class="main-container" id="main-content">
-        <header class="content-card">
-            <h1>張師社會主義民主共和國</h1>
-        </header>
+      <header class="content-card">
+        <h1>張師社會主義民主共和國</h1>
+      </header>
 
-        <div class="content-card">
-            <p style="
-                        text-align: center;
-                        font-size: 20px;
-                        font-weight: 600;
-                        color: var(--accent-color);
-                        ">
-                ☭ 以人民為中心 ☭ 以平等為基礎 ☭
-            </p>
+      <div class="content-card">
+        <p
+          style="
+            text-align: center;
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--accent-color);
+          "
+        >
+          ☭ 以人民為中心 ☭ 以平等為基礎 ☭
+        </p>
+      </div>
+
+      <section class="content-card">
+        <h2>國家理念</h2>
+        <p>我們張師社會主義民主共和國的核心精神是:厚道</p>
+      </section>
+
+      <section class="content-card">
+        <h2>國旗展示</h2>
+        <p>
+          <a
+            href="/index.html#flag"
+            class="liquid-glass-link"
+            aria-label="前往國旗展示"
+          >
+            ☭ 查看張師社會主義民主共和國國旗 ☭
+          </a>
+        </p>
+      </section>
+
+      <section class="content-card">
+        <h2>關於我們</h2>
+        <p>
+          張師社會主義民主共和國由資優班同學共同創立，
+          實行共產主義制度，致力於打造一個沒有階級差異、人人平等的理想國度。
+        </p>
+      </section>
+
+      <section
+        id="quotes-section"
+        class="content-card quotes-section"
+        aria-live="polite"
+      >
+        <div class="quotes-header">
+          <h2>張國語錄電子版</h2>
+          <a
+            href="/index.html#quotes-text"
+            class="liquid-glass-link"
+            aria-label="前往張國語錄文字版"
+          >
+            ☭ 張國語錄文字版 ☭
+          </a>
         </div>
-
-        <section class="content-card">
-            <h2>國家理念</h2>
-            <p>我們張師社會主義民主共和國的核心精神是:厚道</p>
-        </section>
-
-        <section class="content-card">
-            <h2>國旗展示</h2>
-            <p>
-                <a href="/index.html#flag" class="liquid-glass-link" aria-label="前往國旗展示">
-                    ☭ 查看張師社會主義民主共和國國旗 ☭
-                </a>
-            </p>
-        </section>
-
-        <section class="content-card">
-            <h2>關於我們</h2>
-            <p>張師社會主義民主共和國由資優班同學共同創立，
-                實行共產主義制度，致力於打造一個沒有階級差異、人人平等的理想國度。</p>
-        </section>
-
-        <section id="quotes-section" class="content-card quotes-section" aria-live="polite">
-            <div class="quotes-header">
-                <h2>張國語錄電子版</h2>
-                <a href="/index.html#quotes-text" class="liquid-glass-link" aria-label="前往張國語錄文字版">
-                    ☭ 張國語錄文字版 ☭
-                </a>
+        <br />
+        <div class="quotes-board">
+          <div class="quotes-container" id="quotes-container"></div>
+          <div style="text-align: center; margin-top: 10px">
+            <div class="quotes-controls">
+              <button class="page-btn" onclick="showPrevImage()">上一頁</button>
+              <span id="page-indicator">封面</span>
+              <button class="page-btn" onclick="showNextImage()">下一頁</button>
             </div>
-            <br />
-            <div class="quotes-board">
-                <div class="quotes-container" id="quotes-container">
-                </div>
-                <div style="text-align:center; margin-top:10px;">
-                    <div class="quotes-controls">
-                        <button class="page-btn" onclick="showPrevImage()">上一頁</button>
-                        <span id="page-indicator">封面</span>
-                        <button class="page-btn" onclick="showNextImage()">下一頁</button>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="content-card">
-            <h2>附屬網站</h2>
-            <p>
-                <a href="https://ussr.zssdmr.dpdns.org" class="liquid-glass-link" aria-label="前往紅色宇宙論頁面">
-                    ☭ 紅色宇宙論 ☭
-                </a>
-            </p>
-            <br />
-            <p>
-                <a href="https://pinball.zssdmr.dpdns.org" class="liquid-glass-link" aria-label="前往彈珠台小遊戲">
-                    ☭ 彈珠答題遊戲 ☭
-                </a>
-            </p>
-            <br />
-            <p>
-                <a href="https://chat.zssdmr.dpdns.org" class="liquid-glass-link" aria-label="前往思想小助手頁面">
-                    ☭ 思想小助手 ☭
-                </a>
-            </p>
-            <br />
-            <p>
-                <a href="https://chatgtp.zssdmr.dpdns.org" class="liquid-glass-link" aria-label="前往資本家使用的AI小助手頁面">
-                    ☭ AI不花錢，努力搞科研 ☭
-                </a>
-            </p>
-            <br />
-            <p>
-                <a href="https://law.zssdmr.dpdns.org" class="liquid-glass-link" aria-label="前往資本家使用的AI小助手頁面">
-                    ☭ 法律條文 ☭
-                </a>
-            </p>
-        </section>
-
-        <section class="content-card">
-            <h2>張師社會主義民主共和國 - 桌面應用程式</h2>
-            <p>
-                <a href="https://github.com/zssdmrofficial/ZG-Desktop/releases/latest/download/ZG-Desktop-Setup.exe"
-                    class="liquid-glass-link" aria-label="前往下載">
-                    ☭ 下載安裝程式 ☭
-                </a>
-            </p>
-        </section>
-
-        <div class="content-card" style="text-align: center;">
-            <p style="font-size: 14px; color: var(--text-secondary);">© 2026 張師社會主義民主共和國</p>
+          </div>
         </div>
+      </section>
+
+      <section class="content-card">
+        <h2>附屬網站</h2>
+        <p>
+          <a
+            href="https://ussr.zssdmr.dpdns.org"
+            class="liquid-glass-link"
+            aria-label="前往紅色宇宙論頁面"
+          >
+            ☭ 紅色宇宙論 ☭
+          </a>
+        </p>
+        <br />
+        <p>
+          <a
+            href="https://pinball.zssdmr.dpdns.org"
+            class="liquid-glass-link"
+            aria-label="前往彈珠台小遊戲"
+          >
+            ☭ 彈珠答題遊戲 ☭
+          </a>
+        </p>
+        <br />
+        <p>
+          <a
+            href="https://chat.zssdmr.dpdns.org"
+            class="liquid-glass-link"
+            aria-label="前往思想小助手頁面"
+          >
+            ☭ 思想小助手 ☭
+          </a>
+        </p>
+        <br />
+        <p>
+          <a
+            href="https://chatgtp.zssdmr.dpdns.org"
+            class="liquid-glass-link"
+            aria-label="前往資本家使用的AI小助手頁面"
+          >
+            ☭ AI不花錢，努力搞科研 ☭
+          </a>
+        </p>
+        <br />
+        <p>
+          <a
+            href="https://law.zssdmr.dpdns.org"
+            class="liquid-glass-link"
+            aria-label="前往資本家使用的AI小助手頁面"
+          >
+            ☭ 法律條文 ☭
+          </a>
+        </p>
+        <br />
+        <p>
+          <a
+            href="https://space.zssdmr.dpdns.org"
+            class="liquid-glass-link"
+            aria-label="前往Linux系統命令列頁面"
+          >
+            ☭ 系統公有化 ☭
+          </a>
+        </p>
+      </section>
+
+      <section class="content-card">
+        <h2>張師社會主義民主共和國 - 桌面應用程式</h2>
+        <p>
+          <a
+            href="https://github.com/zssdmrofficial/ZG-Desktop/releases/latest/download/ZG-Desktop-Setup.exe"
+            class="liquid-glass-link"
+            aria-label="前往下載"
+          >
+            ☭ 下載安裝程式 ☭
+          </a>
+        </p>
+      </section>
+
+      <div class="content-card" style="text-align: center">
+        <p style="font-size: 14px; color: var(--text-secondary)">
+          © 2026 張師社會主義民主共和國
+        </p>
+      </div>
     </div>
 
     <div id="chat-toggle" class="chat-toggle-button" aria-label="開啟聊天室">
-        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M3 15a4 4 0 0 0 4 4h2l3 3v-3h5a4 4 0 0 0 4-4V7a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4z" />
-        </svg>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="28"
+        height="28"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path
+          d="M3 15a4 4 0 0 0 4 4h2l3 3v-3h5a4 4 0 0 0 4-4V7a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4z"
+        />
+      </svg>
     </div>
 
     <div id="chat-hint" class="chat-hint">要不要和思想小助手聊幾句？</div>
 
-    <div id="chat-widget" class="chat-widget-container" role="dialog" aria-label="AI 聊天室">
-        <div class="liquid_glass-wrapper chat-wrapper">
-            <div class="liquid_glass-outer"></div>
-            <div class="liquid_glass-cover"></div>
-            <div class="liquid_glass-reflect"></div>
-            <div class="liquid_glass-sharp"></div>
+    <div
+      id="chat-widget"
+      class="chat-widget-container"
+      role="dialog"
+      aria-label="AI 聊天室"
+    >
+      <div class="liquid_glass-wrapper chat-wrapper">
+        <div class="liquid_glass-outer"></div>
+        <div class="liquid_glass-cover"></div>
+        <div class="liquid_glass-reflect"></div>
+        <div class="liquid_glass-sharp"></div>
 
-            <div class="chat-content">
-                <div class="chat-header">思想小助手</div>
+        <div class="chat-content">
+          <div class="chat-header">思想小助手</div>
 
-                <div id="chat-scroll-root" class="chat-scroll-root" role="region" aria-label="聊天訊息滾動區"
-                    style="overflow-y: auto; height: 100%;">
-                    <div id="chat-scroll-content" class="chat-scroll-content">
-                        <div id="chat-box" class="chat-box"></div>
-                    </div>
-                </div>
-
-                <div class="chat-input-area">
-                    <input id="user-input" type="text" placeholder="輸入訊息..." class="chat-input" aria-label="訊息輸入">
-                    <button id="send-button" class="chat-send-button">送出</button>
-                </div>
+          <div
+            id="chat-scroll-root"
+            class="chat-scroll-root"
+            role="region"
+            aria-label="聊天訊息滾動區"
+            style="overflow-y: auto; height: 100%"
+          >
+            <div id="chat-scroll-content" class="chat-scroll-content">
+              <div id="chat-box" class="chat-box"></div>
             </div>
+          </div>
+
+          <div class="chat-input-area">
+            <input
+              id="user-input"
+              type="text"
+              placeholder="輸入訊息..."
+              class="chat-input"
+              aria-label="訊息輸入"
+            />
+            <button id="send-button" class="chat-send-button">送出</button>
+          </div>
         </div>
+      </div>
     </div>
 
-    <div id="quotes-text-root" style="display:none;" role="region" aria-label="張國語錄文字版">
-        <section id="quotes-text-section" class="content-card quotes-section" aria-live="polite">
-            <div class="quotes-header">
-                <h2>張國語錄文字版</h2>
-                <a href="/index.html" class="liquid-glass-link" aria-label="回首頁（圖片版）">
-                    ☭ 回首頁 ☭
-                </a>
-            </div>
-            <br />
-            <div id="quotes-text-container" class="liquid-glass-md"></div>
-        </section>
+    <div
+      id="quotes-text-root"
+      style="display: none"
+      role="region"
+      aria-label="張國語錄文字版"
+    >
+      <section
+        id="quotes-text-section"
+        class="content-card quotes-section"
+        aria-live="polite"
+      >
+        <div class="quotes-header">
+          <h2>張國語錄文字版</h2>
+          <a
+            href="/index.html"
+            class="liquid-glass-link"
+            aria-label="回首頁（圖片版）"
+          >
+            ☭ 回首頁 ☭
+          </a>
+        </div>
+        <br />
+        <div id="quotes-text-container" class="liquid-glass-md"></div>
+      </section>
     </div>
 
-    <div id="flag-root" style="display:none;" role="region" aria-label="國旗展示">
-        <section class="content-card">
-            <div class="quotes-header">
-                <h2>張師社會主義民主共和國國旗</h2>
-                <a href="/index.html" class="liquid-glass-link" aria-label="回首頁（圖片版）">
-                    ☭ 回首頁 ☭
-                </a>
-            </div>
-        </section>
-        <section class="content-card" style="text-align: center;">
-            <img src="static/images/張師社會主義民主共和國國旗.png" alt="張師社會主義民主共和國國旗"
-                style="max-width:90%;height:auto;border-radius:16px;box-shadow:0 8px 20px rgba(0,0,0,0.2);" />
-        </section>
+    <div
+      id="flag-root"
+      style="display: none"
+      role="region"
+      aria-label="國旗展示"
+    >
+      <section class="content-card">
+        <div class="quotes-header">
+          <h2>張師社會主義民主共和國國旗</h2>
+          <a
+            href="/index.html"
+            class="liquid-glass-link"
+            aria-label="回首頁（圖片版）"
+          >
+            ☭ 回首頁 ☭
+          </a>
+        </div>
+      </section>
+      <section class="content-card" style="text-align: center">
+        <img
+          src="static/images/張師社會主義民主共和國國旗.png"
+          alt="張師社會主義民主共和國國旗"
+          style="
+            max-width: 90%;
+            height: auto;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+          "
+        />
+      </section>
     </div>
 
     <script src="static/js/marked.min.js"></script>
@@ -210,7 +339,5 @@
     <script src="static/js/ebook.js"></script>
     <script src="static/js/quotes-router.js"></script>
     <script src="static/js/flag-router.js"></script>
-
-</body>
-
+  </body>
 </html>
